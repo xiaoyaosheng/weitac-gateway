@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from models import Service
 # Create your views here.
-class EventViewSet(viewsets.ModelViewSet):
-    model = Event
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    model = Service
     serializer_class = EventSerializer
     permission_classes = (permissions.IsAuthenticated,)
 #     authentication_classes = (SessionAuthentication, BasicAuthentication)
