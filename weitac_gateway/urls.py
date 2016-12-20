@@ -15,9 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from services.views import ServiceViewSet
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^instance/events/?', EventViewSet.as_view({'post': 'event_listener',
-                                                 'delete': 'delete_event'})),
+    url(r'^$', ServiceViewSet.index),
+    url(r'^services/?',
+        ServiceViewSet.as_view({'post': 'create_services',
+                                'put': 'update_services',
+                                'get': 'get_services',
+                                'delete': 'delete_services'}))
 ]

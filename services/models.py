@@ -27,8 +27,8 @@ class Service(models.Model):
 #     category = models.CharField(default='service', max_length=7)
 # #     details = models.CharField(max_length=512, null=True)
 
-    def is_finished(self):
-        return self.finished_at != 0
-
-    class Meta:
-        unique_together = ('instance_id', 'survived_day')
+    # def is_finished(self):
+    #     return self.finished_at != 0
+    #
+    # class Meta:
+    #     unique_together = ('instance_id', 'survived_day')
