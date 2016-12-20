@@ -9,59 +9,49 @@ from services.serializers import ServiceSerializer
 from rest_framework import permissions
 import datetime
 import logging
-# import requests
+import requests
 import base64
 from django.db.models import Q
 from django.http import HttpResponse
 logger = logging.getLogger(__name__)
+import json
+
+def hello(request):
+    return HttpResponse(u"hello")
+
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
     model = Service
     serializer_class = ServiceSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-#     authentication_classes = (SessionAuthentication, BasicAuthentication)
-    parser_classes = (JSONParser, FormParser)
+#     permission_classes = (permissions.IsAuthenticated,)
+# #     authentication_classes = (SessionAuthentication, BasicAuthentication)
+#     parser_classes = (JSONParser, FormParser)
 
     def create_services(self, request, **kwargs):
         logger.info('Recieve an event: {}'.format(request.DATA))
+
         print 'yes'
-        return Response('success',status=status.HTTP_200_OK)
+        env_data=["FOO=bar","BAZ=quux"]
+        cmd_data=["tail -f /var/log/yum.log"]
+        image_data="docker.weitac.com/centos7/haproxy:0.1"
+        labels_data={"com.example.vendor":"Acme","com.example.license":"GPL",
+                        "com.example.version":"1.0"}
+        HostConfig={"NetworkMode":"bridge"}
+
+        data_body={"Env": env_data, "Cmd": cmd_data, "Image": image_data,
+                   "Labels" : labels_data, "HostConfig":HostConfig}
+
+        try:
+            r = requests.post('http://10.6.168.160:2376/containers/create', data=json.dumps(data_body))
+            print r.text
+        except Exception as ex:
+            logging.error("can't get the amount of instance_id in this ur! error: {}".format(ex))
 
 
-    def index(request):
-        return HttpResponse(u"欢迎光临 自强学堂!")
+        return Response('success', status=status.HTTP_200_OK)
 
-    # def delete_services(self, request, **kwargs):
-    #     serializer = TaskSerializer(data=request.DATA)
-    #     if not serializer.is_valid():
-    #         return Response(serializer.errors,
-    #                         status=status.HTTP_400_BAD_REQUEST)
-    #     task = serializer.create()
-    #     logger.debug('object after serialized: {}'.format(task))
-    #     Event.objects.filter(app_id=task.app).delete()
-    #     return Response('success',
-    #                     status=status.HTTP_200_OK)
-    #
-    #
-    # def get_services(self, request, **kwargs):
-    #     logger.info('trigger was called!')
-    #     if not settings.TRIGGER:
-    #         return Response("trigger is false!",
-    #                         status=status.HTTP_200_OK)
-    #     rows = MultiCloudInfo.objects.all()
-    #     logger.info('multicloudinfo len:{}'.format(len(rows)))
-    #     if len(rows) == 0:
-    #         marathon_url = settings.CLUSTER_SCHEDULER['endpoint']
-    #         result = [{'url': marathon_url, 'username': "", 'password': ""}]
-    #     else:
-    #         result = []
-    #         for cloud in rows:
-    #             result.append(cloud.marathon_settings)
-    #
-    #     return Response(result, status=status.HTTP_200_OK)
-    #
-    #
+
     #
     # def update_services(self, request, ** kwargs):
     #     data = request.DATA
@@ -105,3 +95,40 @@ class ServiceViewSet(viewsets.ModelViewSet):
     #     return Response("success",
     #                     status=status.HTTP_200_OK)
 
+
+
+    # def delete_services(self, request, **kwargs):
+    #     serializer = TaskSerializer(data=request.DATA)
+    #     if not serializer.is_valid():
+    #         return Response(serializer.errors,
+    #                         status=status.HTTP_400_BAD_REQUEST)
+    #     task = serializer.create()
+    #     logger.debug('object after serialized: {}'.format(task))
+    #     Event.objects.filter(app_id=task.app).delete()
+    #     return Response('success',
+    #                     status=status.HTTP_200_OK)
+    #
+    #
+    # def get_services(self, request, **kwargs):
+    #     logger.info('trigger was called!')
+    #     if not settings.TRIGGER:
+    #         return Response("trigger is false!",
+    #                         status=status.HTTP_200_OK)
+    #     rows = MultiCloudInfo.objects.all()
+    #     logger.info('multicloudinfo len:{}'.format(len(rows)))
+    #     if len(rows) == 0:
+    #         marathon_url = settings.CLUSTER_SCHEDULER['endpoint']
+    #         result = [{'url': marathon_url, 'username': "", 'password': ""}]
+    #     else:
+    #         result = []
+    #         for cloud in rows:
+    #             result.append(cloud.marathon_settings)
+    #
+    #     return Response(result, status=status.HTTP_200_OK)
+    #
+    #
+    #
+
+
+if __name__ == '__main__':
+    ServiceViewSet.create_services()
