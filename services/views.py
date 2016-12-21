@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import JSONParser, FormParser
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import viewsets
-from models import Service,Instance
+from models import Service, Instance
 from services.serializers import ServiceSerializer
 from rest_framework import permissions
 import datetime
@@ -13,12 +13,13 @@ import requests
 import base64
 from django.db.models import Q
 from django.http import HttpResponse
-
+import docker
 logger = logging.getLogger(__name__)
 import json
 from services.settings import SWARM_URL
 from services.serializers import ServiceSerializer
 
+docker_client = docker.APIClient(base_url='tcp://10.6.168.160:2376',timeout=10)
 
 def hello(request):
     return HttpResponse(u"hello")
@@ -41,53 +42,25 @@ class ServiceViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
         # service = serializer.create()
         # try:
-        if not Service.objects.filter(service_name=data['service_name']).exists():
-            #serializer.save()
-            continer_id= self.create_continer(data['service_name'])
-            print continer_id
-            self.start_continer(continer_id)
+        service_name=data['service_name']
+        instance_amount=data['instance_amount']
+        print type(instance_amount)
+        if not Service.objects.filter(service_name=service_name).exists():
+            instance=Instance_event()
+            for i in range(int(instance_amount)):
+                instance_name=service_name+'_{}'.format(i)
+                instance.create_continer(instance_name)
+                instance.start_continer(instance_name)
+                    # print 'created docker\' continer_id is Null'
+                    # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
+                serializer.save()
         else:
-            print 'Service {} exits'.format(data['service_name'])
+            print 'Service {} exits'.format(service_name)
             return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
                 data['service_name']), status=status.HTTP_400_BAD_REQUEST)
-    # except Exception as ex:
-        #     print ex.message
 
-        print 'success'
         return Response('success', status=status.HTTP_200_OK)
         # logging.debug('object after serialized: {}'.format(service))
-
-    def create_continer(self, request, **kwargs):
-        logger.info('Create a service: {}'.format(request))
-
-        env_data = ["FOO=bar", "BAZ=quux"]
-        cmd_data = ["nginx",
-                    "-g",
-                    "daemon off;"]
-        image_data = "nginx"
-        labels_data = {"com.example.vendor": "Acme", "com.example.license": "GPL",
-                       "com.example.version": "1.0"}
-        HostConfig = {"NetworkMode": "bridge"}
-
-        data_body = {"Env": env_data, "Cmd": cmd_data, "Image": image_data,
-                     "Labels": labels_data, "HostConfig": HostConfig}
-
-        try:
-            r = requests.post(SWARM_URL + '/containers/create', data=json.dumps(data_body))
-            print r.text
-        except Exception as ex:
-            logging.error("swarm url is wrong{}".format(ex))
-        return json.loads(r.text).get('Id')
-        # return Response('success', status=status.HTTP_200_OK)
-
-    def start_continer(self, continer_id):
-        logging.info('Start continer of: {}'.format(continer_id))
-
-        try:
-            r = requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
-            print r.text
-        except Exception as ex:
-            logging.error("can't get the amount of instance_id in this ur! error: {}".format(ex))
 
 
 
@@ -168,42 +141,39 @@ class ServiceViewSet(viewsets.ModelViewSet):
             #
 
 
-class Instance():
+class Instance_event():
     model = Instance
 
-    def create_continer(self, request, **kwargs):
-        logger.info('Create a service: {}'.format(request))
-
-        env_data = ["FOO=bar", "BAZ=quux"]
+    def create_continer(self, instance_name):
+        logger.info('Create a docker instance: {}'.format(instance_name))
         cmd_data = ["nginx",
                     "-g",
                     "daemon off;"]
         image_data = "nginx"
+        env_data = ["FOO=bar", "BAZ=quux"]
         labels_data = {"com.example.vendor": "Acme", "com.example.license": "GPL",
                        "com.example.version": "1.0"}
         HostConfig = {"NetworkMode": "bridge"}
-
-        data_body = {"Env": env_data, "Cmd": cmd_data, "Image": image_data,
-                     "Labels": labels_data, "HostConfig": HostConfig}
-
         try:
-            r = requests.post(SWARM_URL + '/containers/create', data=json.dumps(data_body))
-            print r.text
+            # r = requests.post(SWARM_URL + '/containers/create?name', data=json.dumps(data_body))
+            container_id=docker_client.create_container(image=image_data,
+                              command=cmd_data, name=instance_name)
         except Exception as ex:
-            logging.error("swarm url is wrong{}".format(ex))
-        return json.loads(r.text).get('Id')
-        # return Response('success', status=status.HTTP_200_OK)
+            logging.error("swarm url is wrong: {}".format(ex))
+            return None
+        # b = Instance(service_name='',)
+        # b.save()
+        # container_id = json.loads(r.text).get('Id')
+        print 'Create docker continer :{}'.format(instance_name)
+
 
     def start_continer(self, continer_id):
         logging.info('Start continer of: {}'.format(continer_id))
 
         try:
-            r = requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
-            print r.text
+            requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
         except Exception as ex:
-            logging.error("can't get the amount of instance_id in this ur! error: {}".format(ex))
-
-
+            logging.error("Error: {}".format(ex))
 
 
 if __name__ == '__main__':
