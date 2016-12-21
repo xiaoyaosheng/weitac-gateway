@@ -16,10 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from services.views import ServiceViewSet
-from services.views import hello
+# from services.views import hello
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^hello/$', hello),
+    # url(r'^hello/$', hello),
     url(r'^services/?',
         ServiceViewSet.as_view({'post': 'create_services'
                                 # 'put': 'update_services',

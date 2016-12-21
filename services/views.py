@@ -18,11 +18,13 @@ logger = logging.getLogger(__name__)
 import json
 from services.settings import SWARM_URL
 from services.serializers import ServiceSerializer
-
+import time
+from django.utils import timezone
 docker_client = docker.APIClient(base_url='tcp://10.6.168.160:2376',timeout=10)
 
-def hello(request):
-    return HttpResponse(u"hello")
+def datetime_to_timestamp(t):
+    stamp = int(time.mktime(t.timetuple()))
+    return stamp
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -53,12 +55,15 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 instance.start_continer(instance_name)
                     # print 'created docker\' continer_id is Null'
                     # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
-                serializer.save()
         else:
             print 'Service {} exits'.format(service_name)
             return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
                 data['service_name']), status=status.HTTP_400_BAD_REQUEST)
-
+        serializer.save()
+        created_at = datetime_to_timestamp(timezone.now())
+        service_obj = Service.objects.get(service_name=service_name)
+        service_obj.created_at = created_at
+        service_obj.save()
         return Response('success', status=status.HTTP_200_OK)
         # logging.debug('object after serialized: {}'.format(service))
 
@@ -161,8 +166,9 @@ class Instance_event():
         except Exception as ex:
             logging.error("swarm url is wrong: {}".format(ex))
             return None
-        # b = Instance(service_name='',)
-        # b.save()
+        b = Instance(service_name=instance_name,
+                     instance_id='',created_at='',host_name='')
+        b.save()
         # container_id = json.loads(r.text).get('Id')
         print 'Create docker continer :{}'.format(instance_name)
 

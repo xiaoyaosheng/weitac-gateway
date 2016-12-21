@@ -24,7 +24,7 @@ class Instance(models.Model):
     service_name = models.CharField(max_length=512)
     continer_ip = models.CharField(max_length=20, null=True)
     instance_id = models.IntegerField()
-    image_name = models.CharField(max_length=512)
+    # image_name = models.CharField(max_length=512)
     created_at = models.IntegerField(default=0)
     updated_at = models.IntegerField(default=0)
     host_name = models.CharField(max_length=512)
