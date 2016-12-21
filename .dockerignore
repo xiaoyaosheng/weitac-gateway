@@ -1,0 +1,8 @@
+.git
+.gitignore
+*.pyc
+tmp.db
+.project
+.pydevproject
+.settings
+README.md

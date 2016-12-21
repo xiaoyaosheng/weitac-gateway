@@ -1,0 +1,7 @@
+*.pyc
+tmp.db
+.project
+.pydevproject
+.settings
+test/
+.idea

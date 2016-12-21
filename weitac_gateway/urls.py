@@ -25,5 +25,13 @@ urlpatterns = [
                                 # 'put': 'update_services',
                                 # 'get': 'get_services',
                                 # 'delete': 'delete_services'
-                                }))
+                                })),
+
+
+url(r'^continer/?',
+ServiceViewSet.as_view({'post': 'create_continer'
+                                # 'put': 'update_services',
+                                # 'get': 'get_services',
+                                # 'delete': 'delete_services'
+                                })),
 ]

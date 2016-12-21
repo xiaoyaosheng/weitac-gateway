@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
+# from redisco import models
 from json_field.fields import JSONField
 
 
@@ -8,11 +9,21 @@ class IpInfo(models.Model):
     name = models.CharField(max_length=20)
     is_used = models.BooleanField(default=False)
 
+
 class Service(models.Model):
+    service_name = models.CharField(max_length=512)
+    instance_amount = models.IntegerField()
+    image_name = models.CharField(max_length=512)
+    created_at = models.IntegerField(default=0)
+    updated_at = models.IntegerField(default=0)
+    details = JSONField(default={}, blank=True)
+    finished_at = models.IntegerField(default=0)
+
+class Instance(models.Model):
     name = models.CharField(max_length=512)
     service_name = models.CharField(max_length=512)
-    continer_ip = models.ForeignKey(IpInfo, null=True)
-    instance_id = models.IntegerField(max_length=512)
+    continer_ip = models.CharField(max_length=20, null=True)
+    instance_id = models.IntegerField()
     image_name = models.CharField(max_length=512)
     created_at = models.IntegerField(default=0)
     updated_at = models.IntegerField(default=0)
