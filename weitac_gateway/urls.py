@@ -13,25 +13,30 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.conf.urls import patterns, include, url
+from django.contrib import admin
 from django.conf.urls import url
 from django.contrib import admin
 from services.views import ServiceViewSet
-# from services.views import hello
-urlpatterns = [
+from services.views import hello
+urlpatterns = patterns('',
+    # Examples:
+    # url(r'^$', 'weitac_gateway.views.home', name='home'),
+    # url(r'^blog/', include('blog.urls')),
+
     url(r'^admin/', admin.site.urls),
-    # url(r'^hello/$', hello),
+    url(r'^hello/$', hello),
     url(r'^services/?',
-        ServiceViewSet.as_view({'post': 'create_services'
-                                # 'put': 'update_services',
-                                # 'get': 'get_services',
-                                # 'delete': 'delete_services'
-                                })),
+        ServiceViewSet.as_view({'post': 'create_services',
+                               # 'put': 'update_services',
+                               # 'get': 'get_services',
+                               'delete': 'delete_services'
+                               })),
 
-
-url(r'^continer/?',
-ServiceViewSet.as_view({'post': 'create_continer'
-                                # 'put': 'update_services',
-                                # 'get': 'get_services',
-                                # 'delete': 'delete_services'
-                                })),
-]
+   url(r'^continer/?',
+       ServiceViewSet.as_view({'post': 'create_continer'
+                               # 'put': 'update_services',
+                               # 'get': 'get_services',
+                               # 'delete': 'delete_services'
+                               })),
+)

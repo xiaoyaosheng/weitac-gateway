@@ -1,7 +1,7 @@
 # celery_test.py
 from celery import Celery
 import time
-app = Celery('notify_friends', backend='redis://10.6.168.161:6379/0', broker='redis://10.6.168.161:6379/0')
+app = Celery('notify_friends', backend='amqp://guest@localhost//')
 
 @app.task
 def notify_friends(userId, newsId):
