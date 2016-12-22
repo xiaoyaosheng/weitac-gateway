@@ -53,7 +53,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
         print type(instance_amount)
         if not Service.objects.filter(service_name=service_name).exists():
             serializer.save()
-            instance = Instance_event()
+            instance = Instance_client()
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
                 instance_id = i+1
@@ -74,19 +74,26 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # logging.debug('object after serialized: {}'.format(service))
 
 
-    def delete_services(self, request, **kwargs):
+    def delete_services(self, request):
         data = request.DATA
         service_name = data.get('service_name')
         logger.debug('Start delete services :{}'.format(service_name))
-        #delete instance
-        docker.APIClient(base_url='tcp://10.6.168.160:2376', timeout=10)\
-            .remove_container(container=service_name)
-#sstop
-        Instance.objects.filter(service_name=service_name).delete()
-        #delete services in db
-        Service.objects.filter(service_name=service_name).delete()
-        return Response('success',
-                        status=status.HTTP_200_OK)
+
+        try:
+            service_obj=Service.objects.get(service_name=service_name)
+        except Exception as ex:
+            return Response('Service dose not exit. {}'.format(ex), status=status.HTTP_400_BAD_REQUEST)
+
+        instances=Instance.objects.filter(service=service_obj)
+        for instance in instances:
+            result=Instance_client().delete_continer(instance.continer_id)
+            if result is True:
+                instance.delete()
+            else:
+                return Response('Delete service error.', status=status.HTTP_400_BAD_REQUEST)
+        # if none
+        service_obj.delete()
+        return Response('success', status=status.HTTP_200_OK)
 
 
     # def get_services(self, request, **kwargs):
@@ -155,7 +162,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
 
-class Instance_event(object):
+class Instance_client(object):
     model = Instance
 
     def create_continer(self, service_name,instance_id):
@@ -197,6 +204,13 @@ class Instance_event(object):
         except Exception as ex:
             logging.error("Error: {}".format(ex))
 
+    def delete_continer(self, continer_id):
+        logging.info('Start continer of: {}'.format(continer_id))
 
-if __name__ == '__main__':
-    ServiceViewSet.start_continer('78')
+        try:
+            swarm_client.stop(container=continer_id)
+            swarm_client.remove_container(container=continer_id)
+        except Exception as ex:
+            logging.error("Error: {}".format(ex))
+        return True
+
