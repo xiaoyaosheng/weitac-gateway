@@ -59,10 +59,13 @@ WSGI_APPLICATION = 'weitac_gateway.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': os.path.join(BASE_DIR, 'user_data'),
+        # 'NAME': os.path.join(BASE_DIR, 'user_data'),
+        'NAME': 'user_data',
         'ENGINE': 'django.db.backends.mysql',
-        'USER': 'mysql_user',
-        'PASSWORD': 'superS3cret',
+        'USER': 'root',
+        'PASSWORD': '111111',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
