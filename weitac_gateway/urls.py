@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     # url(r'^hello/$', hello),
     url(r'^services/?',
         ServiceViewSet.as_view({'post': 'create_services',
-                               # 'put': 'update_services',
+                               'put': 'update_services',
                                # 'get': 'get_services',
                                'delete': 'delete_services'
                                })),

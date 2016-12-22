@@ -50,14 +50,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # try:
         service_name = data['service_name']
         instance_amount = data['instance_amount']
-        print type(instance_amount)
+
         if not Service.objects.filter(service_name=service_name).exists():
             serializer.save()
             instance = Instance_client()
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
                 instance_id = i+1
-                container_id=instance.create_continer(service_name,instance_id)
+                container_id=instance.create_instance(service_name,instance_id)
                 instance.start_continer(container_id)
                 # print 'created docker\' continer_id is Null'
                 # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
@@ -73,7 +73,6 @@ class ServiceViewSet(viewsets.ModelViewSet):
         return Response('success', status=status.HTTP_200_OK)
         # logging.debug('object after serialized: {}'.format(service))
 
-
     def delete_services(self, request):
         data = request.DATA
         service_name = data.get('service_name')
@@ -86,7 +85,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
         instances=Instance.objects.filter(service=service_obj)
         for instance in instances:
-            result=Instance_client().delete_continer(instance.continer_id)
+            result=Instance_client().delete_instance(instance.continer_id)
             if result is True:
                 instance.delete()
             else:
@@ -94,6 +93,40 @@ class ServiceViewSet(viewsets.ModelViewSet):
         # if none
         service_obj.delete()
         return Response('success', status=status.HTTP_200_OK)
+
+
+    def update_services(self, request):
+        data = request.DATA
+        logger.info('get user msg:{}'.format(data))
+        service_name=data.get('service_name')
+        new_instance_amount=int(data.get('instance_amount'))
+
+        service_obj=Service.objects.filter(service_name=service_name)
+        if not service_obj:
+            return Response('Your service is not existed.', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            old_amount=service_obj[0].instance_amount
+            change=new_instance_amount-old_amount
+            print change
+            if change==0:
+                return Response('The instance_amount is already {}.'.format(new_instance_amount), status=status.HTTP_400_BAD_REQUEST)
+            if change>0:
+                for i in range(old_amount,new_instance_amount):
+                    result,ex=Instance_client().create_instance(service_name,i+1)
+                    if not result:
+                        return Response('{}'.format(str(ex)), status=status.HTTP_400_BAD_REQUEST)
+            if change<0:
+                print 'yes'
+                for i in range(new_instance_amount,old_amount):
+                    instance_name=service_name+'_{}'.format(i+1)
+                    Instance_client().delete_instance(instance_name)
+                    Instance.objects.get(name=instance_name).delete()
+                    if i==0:
+                        service_obj.delete()
+
+        return Response("success",
+                        status=status.HTTP_200_OK)
+
 
 
     # def get_services(self, request, **kwargs):
@@ -116,47 +149,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
 
-        # def update_services(self, request, ** kwargs):
-        #     data = request.DATA
-        #     logger.info('get user msg:{}'.format(data))
-        #     app_id = data['app_id']
-        #     order = data['event_type']
-        #     logger.debug('get app order {}'.format(data))
-        #     if order == 'START' or order == 'CREATE':
-        #         logger.info('create {} volume by JAKIRO'.format(app_id))
-        #         create_volume_event(app_id, 'JAKIRO')
-        #         if order == 'CREATE' and not AppSizeInfo.objects.filter(app_id=app_id).exists():
-        #             appinfo = AppSizeInfo(app_id=app_id)
-        #             appinfo.size = data['size']
-        #             appinfo.username = data['username']
-        #             appinfo.region_info = data['region']
-        #             appinfo.save()
-        #     if order == 'UPDATE':
-        #         if not AppSizeInfo.objects.filter(app_id=app_id).exists():
-        #             appinfo = AppSizeInfo(app_id=app_id)
-        #             appinfo.size = data['size']
-        #             appinfo.username = data['username']
-        #             appinfo.region_info = data['region']
-        #             appinfo.save()
-        #         else:
-        #             appinfo = AppSizeInfo.objects.get(app_id=app_id)
-        #             if appinfo.size != data['size']:
-        #                 appinfo.size = data['size']
-        #                 appinfo.save()
-        #     if order == 'DESTROY':
-        #         finish_volume_event(app_id)
-        #
-        #     t = timezone.now()
-        #     stnamp = int(time.mktime(t.timetuple()))
-        #     if not Event.objects.filter(app_id=app_id).exists():
-        #         return Response("app:%s not exist" % app_id,
-        #                         status=status.HTTP_400_BAD_REQUEST)
-        #
-        #     if order == "STOP" or order == "DESTROY":
-        #         Event.objects.filter(app_id=app_id,
-        #                              finished_at=0).update(finished_at=stnamp)
-        #     return Response("success",
-        #                     status=status.HTTP_200_OK)
+
 
 
 
@@ -165,7 +158,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 class Instance_client(object):
     model = Instance
 
-    def create_continer(self, service_name,instance_id):
+    def create_instance(self, service_name,instance_id):
         instance_name = service_name + '_{}'.format(instance_id)
         service = Service.objects.get(service_name=service_name)
         logger.info('Create a docker instance: {}'.format(instance_name))
@@ -184,8 +177,8 @@ class Instance_client(object):
                                               name=instance_name)
             container_id = r.get('Id')
         except Exception as ex:
-            logging.error("swarm url is wrong: {}".format(ex))
-            return None
+            logging.error("Error{}".format(ex))
+            return None, ex
         created_at = datetime_to_timestamp(timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
                      service=service, instance_id=instance_id,
@@ -204,7 +197,7 @@ class Instance_client(object):
         except Exception as ex:
             logging.error("Error: {}".format(ex))
 
-    def delete_continer(self, continer_id):
+    def delete_instance(self, continer_id):
         logging.info('Start continer of: {}'.format(continer_id))
 
         try:
