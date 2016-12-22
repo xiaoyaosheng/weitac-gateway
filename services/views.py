@@ -22,7 +22,7 @@ from services.serializers import ServiceSerializer
 import time
 from django.utils import timezone
 
-swarm_client = docker.APIClient(base_url='tcp://10.6.168.160:2376', timeout=10)
+swarm_client = docker.Client(base_url='tcp://10.6.168.160:2376', timeout=10)
 
 
 def datetime_to_timestamp(t):
@@ -46,23 +46,26 @@ class ServiceViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
         # service = serializer.create()
+
         # try:
         service_name = data['service_name']
         instance_amount = data['instance_amount']
         print type(instance_amount)
         if not Service.objects.filter(service_name=service_name).exists():
+            serializer.save()
             instance = Instance_event()
             for i in range(int(instance_amount)):
-                instance_name = service_name + '_{}'.format(i)
-                instance.create_continer(instance_name)
-                instance.start_continer(instance_name)
+                # instance_name = service_name + '_{}'.format(i+1)
+                instance_id = i+1
+                container_id=instance.create_continer(service_name,instance_id)
+                instance.start_continer(container_id)
                 # print 'created docker\' continer_id is Null'
                 # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
         else:
             print 'Service {} exits'.format(service_name)
             return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
                 data['service_name']), status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
+
         created_at = datetime_to_timestamp(timezone.now())
         service_obj = Service.objects.get(service_name=service_name)
         service_obj.created_at = created_at
@@ -155,7 +158,9 @@ class ServiceViewSet(viewsets.ModelViewSet):
 class Instance_event(object):
     model = Instance
 
-    def create_continer(self, instance_name):
+    def create_continer(self, service_name,instance_id):
+        instance_name = service_name + '_{}'.format(instance_id)
+        service = Service.objects.get(service_name=service_name)
         logger.info('Create a docker instance: {}'.format(instance_name))
         cmd_data = ["nginx",
                     "-g",
@@ -167,17 +172,22 @@ class Instance_event(object):
         HostConfig = {"NetworkMode": "bridge"}
         try:
 
-            container_id = swarm_client.create_container(image=image_data,
-                                                          command=cmd_data, name=instance_name)
-            print container_id
+            r = swarm_client.create_container(image=image_data,
+                                              command=cmd_data,
+                                              name=instance_name)
+            container_id = r.get('Id')
         except Exception as ex:
             logging.error("swarm url is wrong: {}".format(ex))
             return None
         created_at = datetime_to_timestamp(timezone.now())
-        b = Instance(name=instance_name, created_at=created_at)
+        b = Instance(name=instance_name, created_at=created_at,
+                     service=service, instance_id=instance_id,
+                     continer_id=container_id,)
+        #host='hostname'
         b.save()
         # container_id = json.loads(r.text).get('Id')
         print 'Create docker continer :{}'.format(instance_name)
+        return container_id
 
     def start_continer(self, continer_id):
         logging.info('Start continer of: {}'.format(continer_id))

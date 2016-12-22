@@ -18,3 +18,6 @@ class ServiceSerializer(serializers.ModelSerializer):
         model = Service
         fields = ('service_name', 'instance_amount', 'image_name', 'created_at',
                   'updated_at', 'finished_at')
+
+    def create(self):
+        return Service(**self.object)

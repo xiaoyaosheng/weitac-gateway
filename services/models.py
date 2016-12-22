@@ -10,6 +10,11 @@ class IpInfo(models.Model):
     is_used = models.BooleanField(default=False)
 
 
+class Agent(models.Model):
+    host_name = models.CharField(max_length=20)
+    host_ip = models.CharField(max_length=20)
+
+
 class Service(models.Model):
     service_name = models.CharField(max_length=512)
     instance_amount = models.IntegerField()
@@ -19,15 +24,17 @@ class Service(models.Model):
     details = JSONField(default={}, blank=True)
     finished_at = models.IntegerField(default=0)
 
+
 class Instance(models.Model):
     name = models.CharField(max_length=512)
-    service_name = models.CharField(max_length=512)
-    continer_ip = models.CharField(max_length=20, null=True)
-    instance_id = models.IntegerField()
+    service = models.ForeignKey(Service, null=True)
+    instance_id = models.CharField(max_length=20, null=True)
+    continer_id = models.CharField(max_length=512, null=True)
+    continer_ip = models.ForeignKey(IpInfo,null=True)
     # image_name = models.CharField(max_length=512)
     created_at = models.IntegerField(default=0)
     updated_at = models.IntegerField(default=0)
-    host_name = models.CharField(max_length=512)
+    host = models.ForeignKey(Agent,null=True)
     details = JSONField(default={}, blank=True)
 
 #     app_id = models.CharField(db_index=True, max_length=512)
