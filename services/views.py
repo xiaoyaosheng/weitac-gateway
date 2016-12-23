@@ -1,26 +1,27 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser, FormParser
-# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import viewsets
 from models import Service, Instance
-from services.serializers import ServiceSerializer
-from rest_framework import permissions
-import datetime
 import logging
 import requests
-import base64
-from django.db.models import Q
-from django.http import HttpResponse
 import docker
-
-logger = logging.getLogger(__name__)
-import json
-from services.settings import SWARM_URL
-from services.serializers import ServiceSerializer
 import time
 from django.utils import timezone
+from services.serializers import ServiceSerializer
+from rest_framework.parsers import JSONParser, FormParser
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework import permissions
+import datetime
+import base64
+from django.http import HttpResponse
+import json
+
+
+logger = logging.getLogger(__name__)
+
+from services.settings import SWARM_URL
+
 
 swarm_client = docker.Client(base_url='tcp://10.6.168.160:2376', timeout=10)
 
@@ -57,7 +58,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
                 instance_id = i + 1
-                _,container_id = instance.create_instance(service_name, instance_id)
+                _, container_id = instance.create_instance(service_name, instance_id)
                 instance.start_instance(container_id)
                 # print 'created docker\' continer_id is Null'
                 # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
@@ -113,24 +114,25 @@ class ServiceViewSet(viewsets.ModelViewSet):
             if change > 0:
                 print 'Start increase instances'
                 for i in range(old_amount, new_instance_amount):
-                    bl, result = Instance_client().create_instance(service_name, i + 1)
 
+                    bl, result = Instance_client().create_instance(service_name, i + 1)
                     if not bl:
                         return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
                     Instance_client().start_instance(result)
             if change < 0:
                 print 'Start decrease instances'
                 for i in range(new_instance_amount, old_amount):
+                    print i
                     instance_name = service_name + '_{}'.format(i + 1)
                     Instance_client().delete_instance(instance_name)
-                Instance.objects.get(name=instance_name).delete()
+                    Instance.objects.get(name=instance_name).delete()
                 if new_instance_amount == 0:
                     service_obj.delete()
                     return Response("success",
                                     status=status.HTTP_200_OK)
 
-        service_obj[0].instance_amount=new_instance_amount
-        service_obj[0].updated_at=datetime_to_timestamp(timezone.now())
+        service_obj[0].instance_amount = new_instance_amount
+        service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
         service_obj[0].save()
         return Response("success",
                         status=status.HTTP_200_OK)
@@ -138,10 +140,25 @@ class ServiceViewSet(viewsets.ModelViewSet):
     def get_services(self, request, **kwargs):
         logger.info('Getting infomation was called')
         agent = request.GET.get('agent')
-        a = swarm_client.containers()
-        return Response(a,
+        detail = request.GET.get('detail')
+        print detail
+        if detail == 'true':
+            result = swarm_client.containers()
+        else:
+            result = []
+            services = Service.objects.all()
+            for service in services:
+                name = service.service_name
+                instance_amount = service.instance_amount
+                image_name = service.image_name
+                updated_at = service.updated_at
+                created_at = service.created_at
+                service_dic = {'name': name, 'instance_amount': instance_amount,
+                               'image_name': image_name, 'updated_at': updated_at,
+                               'created_at': created_at}
+                result.append(service_dic)
+        return Response(result,
                         status=status.HTTP_200_OK)
-
 
 
 class Instance_client(object):
@@ -164,10 +181,11 @@ class Instance_client(object):
             r = swarm_client.create_container(image=image_data,
                                               command=cmd_data,
                                               name=instance_name)
-            container_id = r.get('Id')
+
         except Exception as ex:
             logging.error("Error{}".format(ex))
             return None, ex
+        container_id = r.get('Id')
         created_at = datetime_to_timestamp(timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
                      service=service, instance_id=instance_id,
@@ -188,7 +206,7 @@ class Instance_client(object):
 
     def delete_instance(self, continer_id):
         logging.info('Delete continer of: {}'.format(continer_id))
-
+        print continer_id
         try:
             swarm_client.stop(container=continer_id)
             swarm_client.remove_container(container=continer_id)
