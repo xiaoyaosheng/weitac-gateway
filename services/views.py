@@ -56,9 +56,9 @@ class ServiceViewSet(viewsets.ModelViewSet):
             instance = Instance_client()
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
-                instance_id = i+1
-                container_id=instance.create_instance(service_name,instance_id)
-                instance.start_continer(container_id)
+                instance_id = i + 1
+                _,container_id = instance.create_instance(service_name, instance_id)
+                instance.start_instance(container_id)
                 # print 'created docker\' continer_id is Null'
                 # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -79,13 +79,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
         logger.debug('Start delete services :{}'.format(service_name))
 
         try:
-            service_obj=Service.objects.get(service_name=service_name)
+            service_obj = Service.objects.get(service_name=service_name)
         except Exception as ex:
             return Response('Service dose not exit. {}'.format(ex), status=status.HTTP_400_BAD_REQUEST)
 
-        instances=Instance.objects.filter(service=service_obj)
+        instances = Instance.objects.filter(service=service_obj)
         for instance in instances:
-            result=Instance_client().delete_instance(instance.continer_id)
+            result = Instance_client().delete_instance(instance.continer_id)
             if result is True:
                 instance.delete()
             else:
@@ -94,71 +94,71 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service_obj.delete()
         return Response('success', status=status.HTTP_200_OK)
 
-
     def update_services(self, request):
         data = request.DATA
         logger.info('get user msg:{}'.format(data))
-        service_name=data.get('service_name')
-        new_instance_amount=int(data.get('instance_amount'))
+        service_name = data.get('service_name')
+        new_instance_amount = int(data.get('instance_amount'))
 
-        service_obj=Service.objects.filter(service_name=service_name)
+        service_obj = Service.objects.filter(service_name=service_name)
         if not service_obj:
             return Response('Your service is not existed.', status=status.HTTP_400_BAD_REQUEST)
         else:
-            old_amount=service_obj[0].instance_amount
-            change=new_instance_amount-old_amount
+            old_amount = service_obj[0].instance_amount
+            change = new_instance_amount - old_amount
             print change
-            if change==0:
-                return Response('The instance_amount is already {}.'.format(new_instance_amount), status=status.HTTP_400_BAD_REQUEST)
-            if change>0:
-                for i in range(old_amount,new_instance_amount):
-                    result,ex=Instance_client().create_instance(service_name,i+1)
-                    if not result:
-                        return Response('{}'.format(str(ex)), status=status.HTTP_400_BAD_REQUEST)
-            if change<0:
-                print 'yes'
-                for i in range(new_instance_amount,old_amount):
-                    instance_name=service_name+'_{}'.format(i+1)
-                    Instance_client().delete_instance(instance_name)
-                    Instance.objects.get(name=instance_name).delete()
-                    if i==0:
-                        service_obj.delete()
+            if change == 0:
+                return Response('The instance_amount is already {}.'.format(new_instance_amount),
+                                status=status.HTTP_400_BAD_REQUEST)
+            if change > 0:
+                print 'Start increase instances'
+                for i in range(old_amount, new_instance_amount):
+                    bl, result = Instance_client().create_instance(service_name, i + 1)
 
+                    if not bl:
+                        return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+                    Instance_client().start_instance(result)
+            if change < 0:
+                print 'Start decrease instances'
+                for i in range(new_instance_amount, old_amount):
+                    instance_name = service_name + '_{}'.format(i + 1)
+                    Instance_client().delete_instance(instance_name)
+                Instance.objects.get(name=instance_name).delete()
+                if new_instance_amount == 0:
+                    service_obj.delete()
+                    return Response("success",
+                                    status=status.HTTP_200_OK)
+
+        service_obj[0].instance_amount=new_instance_amount
+        service_obj[0].updated_at=datetime_to_timestamp(timezone.now())
+        service_obj[0].save()
         return Response("success",
                         status=status.HTTP_200_OK)
 
 
 
-    # def get_services(self, request, **kwargs):
-    #     logger.info('trigger was called!')
-    #     if not settings.TRIGGER:
-    #         return Response("trigger is false!",
-    #                         status=status.HTTP_200_OK)
-    #     rows = MultiCloudInfo.objects.all()
-    #     logger.info('multicloudinfo len:{}'.format(len(rows)))
-    #     if len(rows) == 0:
-    #         marathon_url = settings.CLUSTER_SCHEDULER['endpoint']
-    #         result = [{'url': marathon_url, 'username': "", 'password': ""}]
-    #     else:
-    #         result = []
-    #         for cloud in rows:
-    #             result.append(cloud.marathon_settings)
-    #
-    #     return Response(result, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-
+        # def get_services(self, request, **kwargs):
+        #     logger.info('trigger was called!')
+        #     if not settings.TRIGGER:
+        #         return Response("trigger is false!",
+        #                         status=status.HTTP_200_OK)
+        #     rows = MultiCloudInfo.objects.all()
+        #     logger.info('multicloudinfo len:{}'.format(len(rows)))
+        #     if len(rows) == 0:
+        #         marathon_url = settings.CLUSTER_SCHEDULER['endpoint']
+        #         result = [{'url': marathon_url, 'username': "", 'password': ""}]
+        #     else:
+        #         result = []
+        #         for cloud in rows:
+        #             result.append(cloud.marathon_settings)
+        #
+        #     return Response(result, status=status.HTTP_200_OK)
 
 
 class Instance_client(object):
     model = Instance
 
-    def create_instance(self, service_name,instance_id):
+    def create_instance(self, service_name, instance_id):
         instance_name = service_name + '_{}'.format(instance_id)
         service = Service.objects.get(service_name=service_name)
         logger.info('Create a docker instance: {}'.format(instance_name))
@@ -182,14 +182,14 @@ class Instance_client(object):
         created_at = datetime_to_timestamp(timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
                      service=service, instance_id=instance_id,
-                     continer_id=container_id,)
-        #host='hostname'
+                     continer_id=container_id, )
+        # host='hostname'
         b.save()
         # container_id = json.loads(r.text).get('Id')
         print 'Create docker continer :{}'.format(instance_name)
-        return container_id
+        return True, container_id
 
-    def start_continer(self, continer_id):
+    def start_instance(self, continer_id):
         logging.info('Start continer of: {}'.format(continer_id))
 
         try:
@@ -198,7 +198,7 @@ class Instance_client(object):
             logging.error("Error: {}".format(ex))
 
     def delete_instance(self, continer_id):
-        logging.info('Start continer of: {}'.format(continer_id))
+        logging.info('Delete continer of: {}'.format(continer_id))
 
         try:
             swarm_client.stop(container=continer_id)
@@ -206,4 +206,3 @@ class Instance_client(object):
         except Exception as ex:
             logging.error("Error: {}".format(ex))
         return True
-
