@@ -18,12 +18,14 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.contrib import admin
 from services.views import ServiceViewSet
-
+from login.views import login, create
 urlpatterns = patterns('',
                        # Examples:
                        # url(r'^$', 'weitac_gateway.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
-                       url(r'^login/', include('login.urls')),
+                       url(r'^login/', login),
+                       url(r'^create/', create),
+
                        url(r'^admin/', admin.site.urls),
                        url(r'^services/?',
                            ServiceViewSet.as_view({'post': 'create_services',
