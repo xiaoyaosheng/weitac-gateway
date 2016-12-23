@@ -135,24 +135,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
         return Response("success",
                         status=status.HTTP_200_OK)
 
+    def get_services(self, request, **kwargs):
+        logger.info('Getting infomation was called')
+        agent = request.GET.get('agent')
+        a = swarm_client.containers()
+        return Response(a,
+                        status=status.HTTP_200_OK)
 
-
-        # def get_services(self, request, **kwargs):
-        #     logger.info('trigger was called!')
-        #     if not settings.TRIGGER:
-        #         return Response("trigger is false!",
-        #                         status=status.HTTP_200_OK)
-        #     rows = MultiCloudInfo.objects.all()
-        #     logger.info('multicloudinfo len:{}'.format(len(rows)))
-        #     if len(rows) == 0:
-        #         marathon_url = settings.CLUSTER_SCHEDULER['endpoint']
-        #         result = [{'url': marathon_url, 'username': "", 'password': ""}]
-        #     else:
-        #         result = []
-        #         for cloud in rows:
-        #             result.append(cloud.marathon_settings)
-        #
-        #     return Response(result, status=status.HTTP_200_OK)
 
 
 class Instance_client(object):

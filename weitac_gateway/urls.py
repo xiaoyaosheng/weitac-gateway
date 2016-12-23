@@ -20,23 +20,21 @@ from django.contrib import admin
 from services.views import ServiceViewSet
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'weitac_gateway.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+                       # Examples:
+                       # url(r'^$', 'weitac_gateway.views.home', name='home'),
+                       # url(r'^blog/', include('blog.urls')),
+                       url(r'^admin/', admin.site.urls),
+                       url(r'^services/?',
+                           ServiceViewSet.as_view({'post': 'create_services',
+                                                   'put': 'update_services',
+                                                   'delete': 'delete_services',
+                                                   'get': 'get_services',
+                                                   })),
 
-    url(r'^admin/', admin.site.urls),
-    # url(r'^hello/$', hello),
-    url(r'^services/?',
-        ServiceViewSet.as_view({'post': 'create_services',
-                               'put': 'update_services',
-                               # 'get': 'get_services',
-                               'delete': 'delete_services'
-                               })),
-
-   url(r'^continer/?',
-       ServiceViewSet.as_view({'post': 'create_continer'
-                               # 'put': 'update_services',
-                               # 'get': 'get_services',
-                               # 'delete': 'delete_services'
-                               })),
-)
+                       url(r'^continer/?',
+                           ServiceViewSet.as_view({'post': 'create_continer'
+                                                   # 'put': 'update_services',
+                                                   # 'get': 'get_services',
+                                                   # 'delete': 'delete_services'
+                                                   })),
+                       )
