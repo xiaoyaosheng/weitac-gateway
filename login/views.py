@@ -24,8 +24,8 @@ def login(request):
             # 获取的表单数据与数据库进行比较
             user = User.objects.filter(username__exact=username, password__exact=password)
             if user:
-                return HttpResponseRedirect('/create/')
-                # return render_to_response('success.html', {'username': username})
+                return HttpResponseRedirect('/swarm/')
+                # return render_to_response('success_create.html', {'username': username})
             else:
                 return HttpResponseRedirect('/login/')
     else:
@@ -36,6 +36,10 @@ def login(request):
 class CreateForm(forms.Form):
     service_name = forms.CharField(label='服务名：', max_length=100)
     image_name = forms.CharField(label='镜像：', max_length=100)
+
+
+class DeleteForm(forms.Form):
+    service_name = forms.CharField(label='服务名：', max_length=100)
 
 
 def create(request):
@@ -55,8 +59,53 @@ def create(request):
             requests.post('http://127.0.0.1:8080/services',data=data)
             # return Response("success",
             #                 status=status.HTTP_200_OK)
-            return render_to_response('success.html')
+            return render_to_response('success_create.html')
     else:
         uf = CreateForm()
-        print 'cessss'
     return render_to_response('swarm.html', {'uf':uf})
+
+
+def swarm(request):
+    uf = CreateForm()
+    de_uf=DeleteForm()
+    return render_to_response('swarm.html', {'uf': uf,'de_uf':de_uf})
+
+
+def success(request,**kwargs):
+    back_type = str(kwargs['type'])
+    print back_type
+    if back_type=='1':
+        uf = CreateForm(request.POST)
+
+        if uf.is_valid():
+            # 获取表单用户密码
+            service_name = uf.cleaned_data['service_name']
+            image_name = uf.cleaned_data['image_name']
+            data = {
+                "service_name": service_name,
+                "image_name": "ubuntu",
+                "instance_amount": "1",
+                "detail": ""
+            }
+            requests.post('http://127.0.0.1:8080/services', data=data)
+            # return Response("success",
+            #                     status=status.HTTP_200_OK)
+            return render_to_response('success_create.html')
+    if back_type=='2':
+        de_uf = DeleteForm(request.POST)
+
+        if de_uf.is_valid():
+
+            # 获取表单用户密码
+            service_name = de_uf.cleaned_data['service_name']
+            print service_name
+            data = {
+                "service_name": service_name,
+                "image_name": "ubuntu",
+                "instance_amount": "1",
+                "detail": ""
+            }
+            requests.delete('http://127.0.0.1:8080/services', data=data)
+            # return Response("success",
+            #                     status=status.HTTP_200_OK)
+            return render_to_response('success_delete.html')
