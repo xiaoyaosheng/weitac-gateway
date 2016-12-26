@@ -9,6 +9,8 @@ import docker
 import time
 from django.utils import timezone
 from services.serializers import ServiceSerializer
+from utils import service_DBclient
+
 from rest_framework.parsers import JSONParser, FormParser
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework import permissions
@@ -43,14 +45,14 @@ class ServiceViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-        # service = serializer.create()
-
-        # try:
+        service = serializer.object
         service_name = data['service_name']
         instance_amount = data['instance_amount']
 
         if not Service.objects.filter(service_name=service_name).exists():
-            serializer.save()
+            # serializer.save()
+            db_info=dict()
+            db_info['instance']=[]
             instance = Instance_client()
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
@@ -59,21 +61,22 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 print bl
                 if bl:
                     instance.start_instance(result)
+                    db_info['instance'].append(bl)
                     # return Response("success",
                     #                 status=status.HTTP_200_OK)
                 else:
                     return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+
+            db_info['service'] = service
+            service_DBclient.save(db_info)
+            return Response('success', status=status.HTTP_200_OK)
 
         else:
             print 'Service {} exits'.format(service_name)
             return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
                 data['service_name']), status=status.HTTP_400_BAD_REQUEST)
 
-        created_at = datetime_to_timestamp(timezone.now())
-        service_obj = Service.objects.get(service_name=service_name)
-        service_obj.created_at = created_at
-        service_obj.save()
-        return Response('success', status=status.HTTP_200_OK)
+
 
 
 
@@ -191,17 +194,18 @@ class Instance_client(object):
         except Exception as ex:
             logging.error("Error{}".format(ex))
             return None, ex
-        service = Service.objects.get(service_name=service_name)
+        # service = Service.objects.get(service_name=service_name)
         container_id = r.get('Id')
         created_at = datetime_to_timestamp(timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
-                     service=service, instance_id=instance_id,
+                    instance_id=instance_id,
                      continer_id=container_id, )
+        # service = service,
         # host='hostname'
-        b.save()
+        # b.save()
         # container_id = json.loads(r.text).get('Id')
         print 'Create docker continer :{}'.format(instance_name)
-        return True, container_id
+        return b, container_id
 
     def start_instance(self, continer_id):
         logging.info('Start continer of: {}'.format(continer_id))
