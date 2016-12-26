@@ -84,20 +84,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
-STATIC_URL = '/static/'
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'redis_cache.cache.RedisCache',
-#         'LOCATION': '127.0.0.1:6379',
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "redis_cache.client.DefaultClient",
-#         },
-#     },
-# }
 
 # template
 TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR,'templates'),
+)
 
-    '/Users/tengyu/work/weitac/weitac_gateway/login/templates',
+STATIC_URL = '/static/'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+SITE_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
+
+STATICFILES_DIRS = (
+("css", os.path.join(STATIC_ROOT, 'css')),
+("js", os.path.join(STATIC_ROOT, 'js')),
+("images", os.path.join(STATIC_ROOT, 'images')),
+("bower_components", os.path.join(STATIC_ROOT, 'bower_components')),
+("templates", os.path.join(STATIC_ROOT, '../login_old/templates')),
 )

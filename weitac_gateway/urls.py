@@ -18,27 +18,39 @@ from django.contrib import admin
 from django.conf.urls import url
 from django.contrib import admin
 from services.views import ServiceViewSet
-from login.views import login, create, swarm,success
+
 urlpatterns = patterns('',
                        # Examples:
                        # url(r'^$', 'weitac_gateway.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
-                       url(r'^login/', login),
-                       url(r'^success/(?P<type>[A-Za-z0-9-_.]+)/?$', success),
-                           # r'^events/(?P<day>{})/?$'
-                       url(r'^swarm/', swarm),
                        url(r'^admin/', admin.site.urls),
-                       url(r'^services/?',
-                           ServiceViewSet.as_view({'post': 'create_services',
-                                                   'put': 'update_services',
-                                                   'delete': 'delete_services',
-                                                   'get': 'get_services',
-                                                   })),
+                       url(r'^$', 'login.views.index'),
+                       url(r'^index/$', 'login.views.index'),
+                       url(r'^login/$', 'login.views.login'),
+                       url(r'^logout/$', 'login.views.logout'),
 
-                       url(r'^continer/?',
-                           ServiceViewSet.as_view({'post': 'create_continer'
-                                                   # 'put': 'update_services',
-                                                   # 'get': 'get_services',
-                                                   # 'delete': 'delete_services'
-                                                   })),
+                       url(r'^services_manage/$', 'devmanage.views.ip_view'),
+                       url(r'^update_services/$', 'ServiceViewSet.update_services'),
+                       url(r'^add_dev/$', 'devmanage.views.add_dev'),
+                       url(r'^search_ip/$', 'devmanage.views.search_ip'),
+
+
+
+    # url(r'^success/(?P<type>[A-Za-z0-9-_.]+)/?$', success),
+
+    # url(r'^swarm/', swarm),
+
+       url(r'^services/?',
+           ServiceViewSet.as_view({'post': 'create_services',
+                                   'put': 'update_services',
+                                   'delete': 'delete_services',
+                                   'get': 'get_services',
+                                   })),
+
+       url(r'^continer/?',
+           ServiceViewSet.as_view({'post': 'create_continer'
+                                   # 'put': 'update_services',
+                                   # 'get': 'get_services',
+                                   # 'delete': 'delete_services'
+                                   })),
                        )

@@ -17,11 +17,8 @@ import base64
 from django.http import HttpResponse
 import json
 
-
 logger = logging.getLogger(__name__)
-
 from services.settings import SWARM_URL
-
 
 swarm_client = docker.Client(base_url='tcp://10.6.168.160:2376', timeout=10)
 
@@ -58,10 +55,15 @@ class ServiceViewSet(viewsets.ModelViewSet):
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
                 instance_id = i + 1
-                _, container_id = instance.create_instance(service_name, instance_id)
-                instance.start_instance(container_id)
-                # print 'created docker\' continer_id is Null'
-                # return Response('Service Error', status=status.HTTP_400_BAD_REQUEST)
+                bl, result = instance.create_instance(service_name, instance_id)
+                print bl
+                if bl:
+                    instance.start_instance(result)
+                    # return Response("success",
+                    #                 status=status.HTTP_200_OK)
+                else:
+                    return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+
         else:
             print 'Service {} exits'.format(service_name)
             return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
@@ -72,6 +74,10 @@ class ServiceViewSet(viewsets.ModelViewSet):
         service_obj.created_at = created_at
         service_obj.save()
         return Response('success', status=status.HTTP_200_OK)
+
+
+
+        # return Response('Only start {} instances'.format(success_count), status=status.HTTP_400_BAD_REQUEST)
         # logging.debug('object after serialized: {}'.format(service))
 
     def delete_services(self, request):
@@ -166,7 +172,7 @@ class Instance_client(object):
 
     def create_instance(self, service_name, instance_id):
         instance_name = service_name + '_{}'.format(instance_id)
-        service = Service.objects.get(service_name=service_name)
+
         logger.info('Create a docker instance: {}'.format(instance_name))
         cmd_data = ["nginx",
                     "-g",
@@ -185,6 +191,7 @@ class Instance_client(object):
         except Exception as ex:
             logging.error("Error{}".format(ex))
             return None, ex
+        service = Service.objects.get(service_name=service_name)
         container_id = r.get('Id')
         created_at = datetime_to_timestamp(timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
