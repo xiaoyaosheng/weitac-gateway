@@ -8,9 +8,9 @@
         <li class="active">
           <a href="/services_manage/">服务列表</a>
         </li>
-{#        <li>#}
-{#          <a href="/dev_manage/">设备列表</a>#}
-{#        </li>#}
+        <li>
+          <a href="/create_service/">创建服务</a>
+        </li>
         <li>
           <a href="/add_services/">更新服务</a>
         </li>
@@ -34,23 +34,23 @@
 
       <table class="table">
         <th></th>
-        <th>IP地址</th>
-        <th>主机名</th>
-        <th>系统类型</th>
-        <th>开放端口</th>
-        <th>应用</th>
+        <th>服务名</th>
+        <th>实例数量</th>
+        <th>镜像名</th>
+        <th>创建时间</th>
+        <th>details</th>
         <tr>{{search_error}}</tr>
         <form class="form-horizontal" role="form" method="post">
         <!--show ip list-->
           {% if show_list %}
-            {% for ip in show_list %}
+            {% for service in show_list %}
             <tr>
-              <td><input type="checkbox" class="checkbox" name="post_ip" value="{{ ip.ipaddr }}"></td>
-              <td><a href="/mod_ip/?ip={{ ip.ipaddr }}">{{ ip.ipaddr }}</a></td>
-              <td>{{ ip.hostname }}</td>
-              <td>{{ ip.ostype }}</td>
-              <td>{{ ip.ports }}</td>
-              <td>{{ ip.application }}</td>
+              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>
+              <td><a href="/services_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>
+              <td>{{ service.instance_amount }}</td>
+              <td>{{ service.image_name }}</td>
+              <td>{{ service.created_at }}</td>
+              <td>{{ service.details }}</td>
             </tr>
             {% endfor %}
             <button type="submit" class="btn">删除</button>

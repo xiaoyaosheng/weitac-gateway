@@ -1,29 +1,29 @@
-{% extends 'services_manage.html' %}
+{% extends 'service_manage.html' %}
 {% block showpage %}
 <form class="form-horizontal" role="form" method="post">
 {% if ip_info %}
   <div class="control-group">
-    <label class="control-label">IP地址</label>
+    <label class="control-label">服务名</label>
     <div class="controls">
       <p class="control-label">{{ip_info.ipaddr}}</p></div>
   </div>
   <div class="control-group">
-    <label class="control-label">主机名</label>
+    <label class="control-label">实例数量</label>
     <div class="controls">
       <input type="text" class="input-block-level" name="hostname" value="{{ip_info.hostname}}"></div>
   </div>
   <div class="control-group">
-    <label class="control-label">系统类型</label>
+    <label class="control-label">镜像名</label>
     <div class="controls">
       <input type="text" class="input-block-level" name="ostype" value="{{ip_info.ostype}}"></div>
   </div>
   <div class="control-group">
-    <label class="control-label">端口</label>
+    <label class="control-label">创建时间</label>
     <div class="controls">
       <input type="text" class="input-block-level" name="ports" value="{{ip_info.ports}}"></div>
   </div>
   <div class="control-group">
-    <label class="control-label">应用</label>
+    <label class="control-label">id</label>
     <div class="controls">
       <input type="text" class="input-block-level" name="application" value="{{ip_info.application}}"></div>
   </div>
@@ -59,7 +59,7 @@
     <div class="controls">
       <p>{{ add_error }}</p>
       <button type="submit" class="btn">提交</button>
-      <a class="btn" href="/ip_manage/">取消</a>
+      <a class="btn" href="/service_manage/">取消</a>
     </div>
   </div>
 </form>

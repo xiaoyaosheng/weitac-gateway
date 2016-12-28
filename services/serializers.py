@@ -3,9 +3,7 @@ from services.models import Service, IpInfo
 from django.contrib.auth.models import User
 
 
-
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
 
@@ -16,8 +14,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ('service_name', 'instance_amount', 'image_name', 'created_at',
-                  'updated_at', 'finished_at')
+        fields = ('service_name', 'instance_amount', 'image_name','details')
 
     def create(self):
         return Service(**self.object)
