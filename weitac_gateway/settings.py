@@ -52,7 +52,7 @@ WSGI_APPLICATION = 'weitac_gateway.wsgi.application'
 DATABASES = {
     'default': {
         # 'NAME': os.path.join(BASE_DIR, 'user_data'),
-        'NAME': 'user_data',
+        'NAME': 'weitac_gateway',
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'root',
         'PASSWORD': '111111',
@@ -74,9 +74,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-
 STATIC_URL = '/static/'
 # template
 TEMPLATE_DIRS = (
@@ -85,17 +82,6 @@ TEMPLATE_DIRS = (
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-# SITE_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
-# STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-
-# STATICFILES_DIRS = (
-# ("css", os.path.join(STATIC_ROOT, 'css')),
-# ("js", os.path.join(STATIC_ROOT, 'js')),
-# ("images", os.path.join(STATIC_ROOT, 'images')),
-# ("bower_components", os.path.join(STATIC_ROOT, 'bower_components')),
-# # ("templates", os.path.join(STATIC_ROOT, '../login_old/templates')),
-# )
+# Static files (
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

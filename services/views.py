@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -26,12 +27,96 @@ from django.core.serializers.json import DjangoJSONEncoder
 logger = logging.getLogger(__name__)
 from services.settings import SWARM_URL
 
-swarm_client = docker.Client(base_url='tcp://10.6.168.160:2376', timeout=10)
+swarm_client = docker.Client(base_url='tcp://{}'.format(SWARM_URL), timeout=10)
 
 
 def datetime_to_timestamp(t):
     stamp = int(time.mktime(t.timetuple()))
     return stamp
+
+def create_service(request, **kwargs):
+    # print 'jinle!!!!!'
+    service_name= request.POST.get('service_name')
+    instance_amount=request.POST.get('instance_amount')
+    if request.method == 'POST':
+        logger.info('Create a service: {}'.format(service_name))
+        # print type(request.DATA)
+        data = {'service_name': service_name,
+                            'instance_amount': instance_amount,
+                            'image_name': 'ss', 'details': 'dd'}
+        # if isinstance(request.DATA, QueryDict):
+        #     data = {'service_name': service_name,
+        #             'instance_amount': instance_amount,
+        #             'image_name': 'ss', 'details': 'dd'}
+        #
+        # elif isinstance(request.DATA, dict):
+        #     data = request.DATA
+
+        serializer = ServiceSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        service = serializer.object
+        service_name = data['service_name']
+        instance_amount = data['instance_amount']
+        if not Service.objects.filter(service_name=service_name).exists():
+            # serializer.save()
+            db_info = dict()
+            db_info['instance'] = []
+            instance = Instance_client()
+            for i in range(int(instance_amount)):
+                # instance_name = service_name + '_{}'.format(i+1)
+                instance_id = i + 1
+                bl, result = instance.create_instance(service_name, instance_id)
+                print bl
+                if bl:
+                    instance.start_instance(result)
+                    db_info['instance'].append(bl)
+                    # return Response("success",
+                    #                 status=status.HTTP_200_OK)
+                else:
+                    return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+
+            db_info['service'] = service
+            service_DBclient.save(db_info)
+            return render_to_response('create_service.html', {'username': request.user.username})
+
+        else:
+            print 'Service {} exits'.format(service_name)
+            return Response('Service {} exits. Do you want to add more instances? Please use update API'.format(
+                data['service_name']), status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return render_to_response('create_service.html', {'username': request.user.username})
+
+    #                                                        {'username':request.user.username,'ip_info':ip_info}
+
+
+def get_services(request, **kwargs):
+    if request.method == 'POST':
+        ServiceViewSet().delete_services(request)
+    logger.info('Getting infomation was called')
+    agent = request.GET.get('agent')
+    detail = request.GET.get('detail')
+    if detail == 'true':
+        result = swarm_client.containers()
+    else:
+        result = []
+        services = Service.objects.all()
+        for service in services:
+            name = service.service_name
+            instance_amount = service.instance_amount
+            image_name = service.image_name
+            updated_at = service.updated_at
+            created_at = service.created_at
+            service_dic = {'name': name, 'instance_amount': instance_amount,
+                           'image_name': image_name, 'updated_at': updated_at,
+                           'created_at': created_at}
+            result.append(service_dic)
+    # return Response(result,
+    #                 status=status.HTTP_200_OK)
+    print services
+    print request.user.username
+    return render_to_response('service_manage.html', {'username': request.user.username, 'show_list': services})
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -152,27 +237,29 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
     def delete_services(self, request):
-        data = request.DATA
-        print data
-        post_service = data.get('post_service')
+        # data = request.DATA
+        # print data
+        # post_service = data.get('post_service')
         # for service_name in post_service:
-        service_name = post_service
-        logger.debug('Start delete services :{}'.format(service_name))
+        post_services= request.POST.getlist('post_service')
+        for post_service in post_services:
+            service_name=post_service
+            logger.debug('Start delete services :{}'.format(service_name))
+            # print(('Start delete services :{}'.format(service_name)))
+            try:
+                service_obj = Service.objects.get(service_name=service_name)
+            except Exception as ex:
+                return Response('Service dose not exit. {}'.format(ex), status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            service_obj = Service.objects.get(service_name=service_name)
-        except Exception as ex:
-            return Response('Service dose not exit. {}'.format(ex), status=status.HTTP_400_BAD_REQUEST)
-
-        instances = Instance.objects.filter(service=service_obj)
-        for instance in instances:
-            result = Instance_client().delete_instance(instance.continer_id)
-            if result is True:
-                instance.delete()
-            else:
-                return Response('Delete service error.', status=status.HTTP_400_BAD_REQUEST)
-        # if none
-        service_obj.delete()
+            instances = Instance.objects.filter(service=service_obj)
+            for instance in instances:
+                result = Instance_client().delete_instance(instance.continer_id)
+                if result is True:
+                    instance.delete()
+                else:
+                    return Response('Delete service error.', status=status.HTTP_400_BAD_REQUEST)
+            # if none
+            service_obj.delete()
         # return Response('success', status=status.HTTP_200_OK)
         services = Service.objects.all()
         return render_to_response('service_manage.html', {'username': request.user.username, 'show_list': services})
