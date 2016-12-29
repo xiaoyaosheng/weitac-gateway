@@ -1,4 +1,3 @@
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
@@ -76,7 +75,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # template
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR,'templates'),
+    os.path.join(BASE_DIR, 'templates'),
 )
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -85,9 +84,7 @@ STATICFILES_DIRS = (
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-
 LOG_PATH = '/var/log/weitac_gateway/'
-
 
 LOGGING = {
     'version': 1,
@@ -101,7 +98,7 @@ LOGGING = {
         'debug': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH + '.debug.log',
+            'filename': LOG_PATH + 'debug.log',
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
             'formatter': 'standard',
@@ -109,7 +106,7 @@ LOGGING = {
         'info': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH + '.info.log',
+            'filename': LOG_PATH + 'info.log',
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
             'formatter': 'standard',
@@ -117,7 +114,8 @@ LOGGING = {
         'error': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOG_PATH + '.error.log',
+            # 'filename': LOG_PATH + '.error.log',
+            'filename': LOG_PATH + 'error.log',
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 5,
             'formatter': 'standard',
