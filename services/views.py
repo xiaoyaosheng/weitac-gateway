@@ -119,6 +119,54 @@ def get_services(request, **kwargs):
     return render_to_response('service_manage.html', {'username': request.user.username, 'show_list': services})
 
 
+def update_service(request):
+    if request.method =="POST":
+        service_name=request.POST.get('service_name')
+        new_instance_amount=int(request.POST.get('instance_amount'))
+        # data = request.DATA
+        # logger.info('get user msg:{}'.format(data))
+        # service_name = data.get('service_name')
+        # new_instance_amount = int(data.get('instance_amount'))
+
+        service_obj = Service.objects.filter(service_name=service_name)
+        if not service_obj:
+            return Response('Your service is not existed.', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            old_amount = service_obj[0].instance_amount
+            change = new_instance_amount - old_amount
+            print change
+            if change == 0:
+                return render_to_response('400.html')
+                                # status=status.HTTP_400_BAD_REQUEST)
+            if change > 0:
+                print 'Start increase instances'
+                for i in range(old_amount, new_instance_amount):
+
+                    bl, result = Instance_client().create_instance(service_name, i + 1)
+                    # print service_obj
+                    bl.service = service_obj[0]
+                    bl.save()
+                    if not bl:
+                        return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+                    Instance_client().start_instance(result)
+            if change < 0:
+                print 'Start decrease instances'
+                for i in range(new_instance_amount, old_amount):
+                    print i
+                    instance_name = service_name + '_{}'.format(i + 1)
+                    Instance_client().delete_instance(instance_name)
+                    Instance.objects.get(name=instance_name).delete()
+                if new_instance_amount == 0:
+                    service_obj.delete()
+                    return render_to_response('update_service.html')
+
+        service_obj[0].instance_amount = new_instance_amount
+        service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
+        service_obj[0].save()
+        return render_to_response('update_service.html')
+    else:
+        return render_to_response('update_service.html')
+
 class ServiceViewSet(viewsets.ModelViewSet):
     model = Service
     serializer_class = ServiceSerializer
@@ -375,7 +423,8 @@ class Instance_client(object):
         logging.info('Start continer of: {}'.format(continer_id))
 
         try:
-            requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
+            swarm_client.start(container=continer_id)
+            # requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
         except Exception as ex:
             logging.error("Error: {}".format(ex))
 
