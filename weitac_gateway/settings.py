@@ -1,5 +1,14 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Los_Angeles'
+CELERY_ENABLE_UTC = True
+CELERY_IMPORTS = ("jobs.tasks")
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -26,6 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'djcelery',
     # 'rest_framework.authtoken',
     'services',
     'login',

@@ -11,7 +11,8 @@ def save(dic_info):
     print dic_info
     service = dic_info.get('service')
     created_at = datetime_to_timestamp(timezone.now())
-    service.created_at = created_at
+    print created_at
+    service.created_at = str(created_at)
     service.save()
 
     instance_list = dic_info.get('instance')

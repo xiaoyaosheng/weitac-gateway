@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
-from models import Service, Instance
+from models import Service, Instance,Agent
 import logging
 import requests
 import docker
@@ -33,6 +33,7 @@ swarm_client = docker.Client(base_url='tcp://{}'.format(SWARM_URL), timeout=10)
 def datetime_to_timestamp(t):
     stamp = int(time.mktime(t.timetuple()))
     return stamp
+
 
 def create_service(request, **kwargs):
     service_name= request.POST.get('service_name')
@@ -75,7 +76,7 @@ def create_service(request, **kwargs):
                     #                 status=status.HTTP_200_OK)
                 else:
                     return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
-
+            Instance_client().add_host_info(db_info)
             db_info['service'] = service
             service_DBclient.save(db_info)
             return render_to_response('create_service.html', {'username': request.user.username})
@@ -436,3 +437,20 @@ class Instance_client(object):
         except Exception as ex:
             logger.error("Error: {}".format(ex))
         return True
+
+
+    def add_host_info(self,db_info):
+        mapping={}
+        a = swarm_client.containers()
+        for b in a:
+            host_name = b.get('Names')[0].split('/')[1]
+            server_name = b.get('Names')[0].split('/')[2]
+            mapping[server_name]=host_name
+        instances=db_info.get('instance')
+        for instance in instances:
+            host_name=mapping.get(instance.name)
+            try:
+                instance.host=Agent.objects.get(host_name=host_name)
+            except:
+                pass
+        return db_info
