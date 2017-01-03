@@ -30,11 +30,11 @@ class Instance(models.Model):
     service = models.ForeignKey(Service, null=True)
     instance_id = models.CharField(max_length=20, null=True)
     continer_id = models.CharField(max_length=512, null=True)
-    continer_ip = models.ForeignKey(IpInfo,null=True)
+    continer_ip = models.ForeignKey(IpInfo, null=True)
     # image_name = models.CharField(max_length=512)
     created_at = models.IntegerField(default=0)
     updated_at = models.IntegerField(default=0)
-    host = models.ForeignKey(Agent,null=True)
+    host = models.ForeignKey(Agent, null=True)
     details = JSONField(default={}, blank=True)
 
 #     app_id = models.CharField(db_index=True, max_length=512)

@@ -26,7 +26,9 @@ def login(request):
             # request.session['username']=username
             return HttpResponseRedirect('/index/')
         else:
-            return render_to_response('login.html', {'login_error': '用户名或密码错误!'})
+            return render_to_response(
+                'login.html', {
+                    'login_error': '用户名或密码错误!'})
     return render_to_response('login.html')
 
 

@@ -8,7 +8,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Los_Angeles'
 CELERY_ENABLE_UTC = True
-CELERY_IMPORTS = ("jobs.tasks")
+CELERY_IMPORTS = ("jobs.tasks","jobs.views")
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 from celery import Celery
-from celery import shared_task,task
+from celery import shared_task, task
 
 
 @task()

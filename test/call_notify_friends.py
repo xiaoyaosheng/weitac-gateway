@@ -10,4 +10,4 @@ def notify(userId, messageId):
     print result.get(timeout=1)
 
 if __name__ == '__main__':
- notify('001', '001')
+    notify('001', '001')

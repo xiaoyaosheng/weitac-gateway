@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
 
@@ -14,7 +15,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ('service_name', 'instance_amount', 'image_name','details')
+        fields = ('service_name', 'instance_amount', 'image_name', 'details')
 
     def create(self):
         return Service(**self.object)
