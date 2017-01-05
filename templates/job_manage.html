@@ -34,26 +34,24 @@
 
       <table class="table">
         <th></th>
-        <th>服务名</th>
-        <th>实例数量</th>
-        <th>镜像名</th>
-        <th>创建时间</th>
+        <th>脚本名</th>
+        <th>更新时间</th>
         <th>details</th>
-        <tr>{{search_error}}</tr>
+{#        <tr>{{search_error}}</tr>#}
         <form class="form-horizontal" role="form" method="post">
         <!--show ip list-->
           {% if show_list %}
-            {% for service in show_list %}
+            {% for script in show_list %}
             <tr>
-              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>
-              <td><a href="/services_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>
-              <td>{{ service.instance_amount }}</td>
-              <td>{{ service.image_name }}</td>
-              <td>{{ service.created_at }}</td>
-              <td>{{ service.details }}</td>
+{#              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>#}
+{#              <td><a href="/job_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>#}
+                <th></th>
+                <td>{{ script.job_name }}</td>
+              <td>{{ script.updated_at }}</td>
+              <td>{{ script.info }}</td>
             </tr>
             {% endfor %}
-            <button type="submit" class="btn">删除</button>
+{#            <button type="submit" class="btn">删除</button>#}
           {%endif%}
 
         </form>

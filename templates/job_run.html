@@ -1,67 +1,70 @@
 {% extends 'job_manage.html' %}
 {% block showpage %}
-<form class="form-horizontal" role="form" method="post">
-{% if ip_info %}
-  <div class="control-group">
-    <label class="control-label">服务名</label>
-    <div class="controls">
-      <p class="control-label">{{ip_info.ipaddr}}</p></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">实例数量</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="hostname" value="{{ip_info.hostname}}"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">镜像名</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="ostype" value="{{ip_info.ostype}}"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">创建时间</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="ports" value="{{ip_info.ports}}"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">id</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="application" value="{{ip_info.application}}"></div>
-  </div>
-{% else %}
-  <div class="control-group">
-    <label class="control-label">IP地址</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="ipaddr"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">主机名</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="hostname"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">系统类型</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="ostype"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">端口</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="ports"></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">应用</label>
-    <div class="controls">
-      <input type="text" class="input-block-level" name="application"></div>
-  </div>
-{% endif %}
+{#<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">#}
+
+    <form class="form-horizontal" role="form" method="post">
+    <div class="container">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            选择脚本
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                {% if scripts %}
+                    {% for script in scripts %}
+                        <li><a href="/job_run/?job_name={{ script.job_name }}" methods="PUT" role="menuitem">{{script.job_name}}</a></li>
+                    {% endfor %}
+                {%endif%}
+
+            </ul>
+        </div>
+    </div>
+
+        {% if choiced_script %}
+            <li><a >{{ choiced_script}}</a></li>
+        {%endif%}
+{#<div class="btn-group">#}
+{#    {% if scripts %}#}
+{#        {% for agent in agents %}#}
+{#            <button class="btn">{{agent.host_name}}</button>#}
+{#        {% endfor %}#}
+{#    {%endif%}#}
+{##}
+{#</div>#}
+<div class="btn-group" data-toggle="buttons">
+    {% if agents %}
+        {% for agent in agents %}
+             <label class="btn btn-primary ">
+                <input type="checkbox" name={{agent.host_name}} autocomplete="off"> {{agent.host_name}}
+             </label>
+
+        {% endfor %}
+    {%endif%}
+{#  <label class="btn btn-primary ">#}
+{#    <input type="checkbox" name="Checkbox 1" autocomplete="off"> Checkbox 1#}
+{#  </label>#}
+{#  <label class="btn btn-primary">#}
+{#    <input type="checkbox" name="Checkbox 2" autocomplete="off"> Checkbox 2#}
+{#  </label>#}
+{#  <label class="btn btn-primary">#}
+{#    <input type="checkbox" name="Checkbox 3" autocomplete="off"> Checkbox 3#}
+{#  </label>#}
+</div>
+
 
   <div class="control-group">
     <div class="controls">
       <p>{{ add_error }}</p>
       <button type="submit" class="btn">提交</button>
-      <a class="btn" href="/service_manage/">取消</a>
+      <a class="btn" href="/job_manage/">取消</a>
     </div>
   </div>
+
 </form>
 
+{#    	<script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>#}
+{#	<script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+
+{#	<script src="/static/js/jquery-3.1.1.min.js"></script>#}
+{#	<script src="/static/js/bootstrap-3.3.7.js"></script>#}
 {% endblock %}

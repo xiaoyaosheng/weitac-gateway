@@ -4,8 +4,8 @@ from django.db import models
 import django.utils
 
 class Job(models.Model):
-    service_name = models.CharField(max_length=512)
+    job_name = models.CharField(max_length=512)
 
     updated_at = models.DateTimeField(auto_now=True)
 
-    info = models.FileField(default={}, blank=True)
+    info = models.BinaryField(default={}, blank=True)

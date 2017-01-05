@@ -8,26 +8,50 @@ import time
 from django.utils import timezone
 from services.serializers import ServiceSerializer
 from utils import service_DBclient
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from models import Job
 from celery import task
+from django import forms
+import json
+from services.models import Agent
+from rest_framework.parsers import JSONParser, FormParser
 
 
 # add.delay(2, 2)
 
+
 def job_manage(request):
-    print request
     if request.method == 'POST':
         render_to_response(
             'job_manage.html', {
                 'username': request.user.username})
 
     else:
-
+        scripts = Job.objects.all()
+        print scripts[0].job_name
         return render_to_response(
             'job_manage.html', {
-                'username': request.user.username})
+                'username': request.user.username, 'show_list': scripts})
 
+
+# def job_upload(request):
+#     if request.method == 'POST':
+#         # script= request.POST.get('script')
+#         # print type(script)
+#         # print request
+#         myFile = request.FILES.get('script', None)
+#
+#         obj = request.FILES.get('script')
+#         f = open(obj.name, 'wb')
+#         for chunk in obj.chunks():
+#             f.write(chunk)
+#         f.close()
+#         return Response(request)
+#     else:
+#
+#             return render_to_response(
+#                 'job_upload.html', {
+#                     'username': request.user.username})
 
 def job_upload(request):
     if request.method == 'POST':
@@ -35,24 +59,13 @@ def job_upload(request):
         # print type(script)
         # print request
         myFile = request.FILES.get('script', None)
-        print '!!!!!!!!!!!!!!!'
-        print(myFile._size)  # 文件大小字节数
-        # bin_all = myFile.read()  # 一次过读取文件内容（会占很多内存）
-        # for chunk in myFile.chuncks():
-        #     fout.write(chunk)
-
-
-        # if not myFile:
-        #     return HttpResponse("no files for upload!")
-        # destination = open(os.path.join("E:\\upload", myFile.name), 'wb+')  # 打开特定的文件进行二进制的写操作
-        # for chunk in myFile.chunks():  # 分块写入文件
-        #     destination.write(chunk)
-        # destination.close()
-        # return HttpResponse("upload over!"
+        # print(myFile._size)  # 文件大小字节数
+        # print type(myFile)
+        data = myFile.read()
         job_obj = Job()
 
-        job_obj.service_name = 'mysc'
-        job_obj.info = myFile
+        job_obj.job_name = myFile
+        job_obj.info = data
         job_obj.save()
         return render_to_response(
             'job_upload.html', {
@@ -67,21 +80,47 @@ def job_upload(request):
 
 def job_run(request):
     if request.method == 'POST':
-        script = ''
-        agent = ''
-        add_celery_job.delay(script, agent)
+        # print request
+        script_name = request.GET.get('job_name')
+        script_obj = Job.objects.filter(job_name=script_name)[0]
+        agent_hosts_lis = request.POST.lists()
+        for agent_host_set in agent_hosts_lis:
+            agent = agent_host_set[0]
+            print agent
+            try:
+                ip_addr = Agent.objects.get(host_name=agent).host_ip
+            except:
+                return render_to_response('400.html')
+            script = script_obj.info
 
-        return render_to_response('job_run.html', {'username': request.user.username})
+            # headers = {'Accept': 'application/json'}
+            # r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
+
+            # r = add_celery_job.delay(script, ip_addr)
+            # print r.get()
+        return render_to_response('job_manage.html')
 
     else:
-
-        return render_to_response(
-            'job_run.html', {
-                'username': request.user.username})
+        scripts = Job.objects.all()
+        agents = Agent.objects.all()
+        if not request.GET.get('job_name'):
+            return render_to_response(
+                'job_run.html', {
+                    'username':
+                        request.user.username, 'scripts': scripts,
+                    'agents': agents})
+        else:
+            job_name = request.GET.get('job_name')
+            return render_to_response(
+                'job_run.html', {
+                    'username':
+                        request.user.username, 'scripts': scripts,
+                    'agents': agents, 'choiced_script': job_name})
 
 
 @task()
-def add_celery_job(script, agent):
-    x = 1
-    y = 2
-    return x + y
+def add_celery_job(script, ip_addr):
+    headers = {'Accept': 'application/json'}
+    r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
+    print r.text
+    return r.text
