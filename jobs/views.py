@@ -82,6 +82,9 @@ def job_run(request):
     if request.method == 'POST':
         # print request
         script_name = request.GET.get('job_name')
+
+        if not script_name:
+            return render_to_response('400.html')
         script_obj = Job.objects.filter(job_name=script_name)[0]
         agent_hosts_lis = request.POST.lists()
         for agent_host_set in agent_hosts_lis:
@@ -93,11 +96,12 @@ def job_run(request):
                 return render_to_response('400.html')
             script = script_obj.info
 
-            # headers = {'Accept': 'application/json'}
+            headers = {'Accept': 'application/json'}
             # r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
+            print script
+            add_celery_job.delay(script,script_name, ip_addr)
+            # r = requests.post('http://10.6.168.161:8000', data=script, headers=headers)
 
-            # r = add_celery_job.delay(script, ip_addr)
-            # print r.get()
         return render_to_response('job_manage.html')
 
     else:
@@ -119,8 +123,9 @@ def job_run(request):
 
 
 @task()
-def add_celery_job(script, ip_addr):
+def add_celery_job(script, script_name,ip_addr):
     headers = {'Accept': 'application/json'}
-    r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
-    print r.text
-    return r.text
+    r = requests.post('http://{0}:8000/{1}'.format(ip_addr,script_name), data=script, headers=headers)
+    # print r.text
+
+    # return r.text
