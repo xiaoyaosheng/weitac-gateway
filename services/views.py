@@ -38,6 +38,23 @@ def datetime_to_timestamp(t):
 def create_service(request, **kwargs):
     service_name = request.POST.get('service_name')
     instance_amount = request.POST.get('instance_amount')
+    if not instance_amount:
+        instance_amount = '1'
+    image_name = request.POST.get('image_name')
+    if not image_name:
+        image_name = 'docker.weitac.com/centos7/haproxy:0.2'
+    environment = request.POST.get('environment')
+    if not environment:
+        environment = None
+    hostname = request.POST.get('hostname')
+    if not hostname:
+        environment = 'haproxy.weitac.com'
+    command = request.POST.get('command')
+    if not command:
+        command = '/usr/sbin/init'
+    volumes = request.POST.get('volumes')
+    if not volumes:
+        volumes = './conf:/etc/haproxy'
     if request.method == 'POST':
         logger.info('Create a service: {}'.format(service_name))
 
@@ -68,8 +85,10 @@ def create_service(request, **kwargs):
             for i in range(int(instance_amount)):
                 # instance_name = service_name + '_{}'.format(i+1)
                 instance_id = i + 1
-                bl, result = instance.create_instance(service_name, instance_id)
-
+                bl, result = instance.create_instance \
+                    (service_name, instance_id, image_name, environment, hostname, command, volumes)
+                if not bl:
+                    return render_to_response('500.html')
                 if bl:
                     instance.start_instance(result)
                     db_info['instance'].append(bl)
@@ -100,7 +119,7 @@ def create_service(request, **kwargs):
             'create_service.html', {
                 'username': request.user.username})
 
-    #                                                        {'username':request.user.username,'ip_info':ip_info}
+        #                                                        {'username':request.user.username,'ip_info':ip_info}
 
 
 def get_services(request, **kwargs):
@@ -114,16 +133,16 @@ def get_services(request, **kwargs):
     # else:
     #     result = []
     services = Service.objects.all()
-        # for service in services:
-        #     name = service.service_name
-        #     instance_amount = service.instance_amount
-        #     image_name = service.image_name
-        #     updated_at = service.updated_at
-        #     created_at = service.created_at
-        #     service_dic = {'name': name, 'instance_amount': instance_amount,
-        #                    'image_name': image_name, 'updated_at': updated_at,
-        #                    'created_at': created_at}
-        #     result.append(service_dic)
+    # for service in services:
+    #     name = service.service_name
+    #     instance_amount = service.instance_amount
+    #     image_name = service.image_name
+    #     updated_at = service.updated_at
+    #     created_at = service.created_at
+    #     service_dic = {'name': name, 'instance_amount': instance_amount,
+    #                    'image_name': image_name, 'updated_at': updated_at,
+    #                    'created_at': created_at}
+    #     result.append(service_dic)
     return render_to_response(
         'service_manage.html', {
             'username': request.user.username, 'show_list': services})
@@ -156,7 +175,7 @@ def update_service(request):
                 for i in range(old_amount, new_instance_amount):
 
                     bl, result = Instance_client().create_instance(service_name, i + 1)
-                    # print service_obj
+
                     bl.service = service_obj[0]
                     bl.save()
                     if not bl:
@@ -368,99 +387,101 @@ class ServiceViewSet(viewsets.ModelViewSet):
             'service_manage.html', {
                 'username': request.user.username, 'show_list': services})
 
-    # def update_services(self, request):
-    #     data = request.DATA
-    #     logger.info('get user msg:{}'.format(data))
-    #     service_name = data.get('service_name')
-    #     new_instance_amount = int(data.get('instance_amount'))
-    #
-    #     service_obj = Service.objects.filter(service_name=service_name)
-    #     if not service_obj:
-    #         return Response('Your service is not existed.', status=status.HTTP_400_BAD_REQUEST)
-    #     else:
-    #         old_amount = service_obj[0].instance_amount
-    #         change = new_instance_amount - old_amount
-    #         print change
-    #         if change == 0:
-    #             return Response('The instance_amount is already {}.'.format(new_instance_amount),
-    #                             status=status.HTTP_400_BAD_REQUEST)
-    #         if change > 0:
-    #             print 'Start increase instances'
-    #             for i in range(old_amount, new_instance_amount):
-    #
-    #                 bl, result = Instance_client().create_instance(service_name, i + 1)
-    #                 bl.service = service_obj
-    #                 bl.save()
-    #                 if not bl:
-    #                     return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
-    #                 Instance_client().start_instance(result)
-    #         if change < 0:
-    #             print 'Start decrease instances'
-    #             for i in range(new_instance_amount, old_amount):
-    #                 print i
-    #                 instance_name = service_name + '_{}'.format(i + 1)
-    #                 Instance_client().delete_instance(instance_name)
-    #                 Instance.objects.get(name=instance_name).delete()
-    #             if new_instance_amount == 0:
-    #                 service_obj.delete()
-    #                 return Response("success",
-    #                                 status=status.HTTP_200_OK)
-    #
-    #     service_obj[0].instance_amount = new_instance_amount
-    #     service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
-    #     service_obj[0].save()
-    #     return Response("success",
-    #                     status=status.HTTP_200_OK)
+        # def update_services(self, request):
+        #     data = request.DATA
+        #     logger.info('get user msg:{}'.format(data))
+        #     service_name = data.get('service_name')
+        #     new_instance_amount = int(data.get('instance_amount'))
+        #
+        #     service_obj = Service.objects.filter(service_name=service_name)
+        #     if not service_obj:
+        #         return Response('Your service is not existed.', status=status.HTTP_400_BAD_REQUEST)
+        #     else:
+        #         old_amount = service_obj[0].instance_amount
+        #         change = new_instance_amount - old_amount
+        #         print change
+        #         if change == 0:
+        #             return Response('The instance_amount is already {}.'.format(new_instance_amount),
+        #                             status=status.HTTP_400_BAD_REQUEST)
+        #         if change > 0:
+        #             print 'Start increase instances'
+        #             for i in range(old_amount, new_instance_amount):
+        #
+        #                 bl, result = Instance_client().create_instance(service_name, i + 1)
+        #                 bl.service = service_obj
+        #                 bl.save()
+        #                 if not bl:
+        #                     return Response('{}'.format(str(result)), status=status.HTTP_400_BAD_REQUEST)
+        #                 Instance_client().start_instance(result)
+        #         if change < 0:
+        #             print 'Start decrease instances'
+        #             for i in range(new_instance_amount, old_amount):
+        #                 print i
+        #                 instance_name = service_name + '_{}'.format(i + 1)
+        #                 Instance_client().delete_instance(instance_name)
+        #                 Instance.objects.get(name=instance_name).delete()
+        #             if new_instance_amount == 0:
+        #                 service_obj.delete()
+        #                 return Response("success",
+        #                                 status=status.HTTP_200_OK)
+        #
+        #     service_obj[0].instance_amount = new_instance_amount
+        #     service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
+        #     service_obj[0].save()
+        #     return Response("success",
+        #                     status=status.HTTP_200_OK)
 
-    # def get_services(self, request, **kwargs):
-    #     logger.info('Getting infomation was called')
-    #     agent = request.GET.get('agent')
-    #     detail = request.GET.get('detail')
-    #     if detail == 'true':
-    #         result = swarm_client.containers()
-    #     else:
-    #         result = []
-    #         services = Service.objects.all()
-    #         for service in services:
-    #             name = service.service_name
-    #             instance_amount = service.instance_amount
-    #             image_name = service.image_name
-    #             updated_at = service.updated_at
-    #             created_at = service.created_at
-    #             service_dic = {'name': name, 'instance_amount': instance_amount,
-    #                            'image_name': image_name, 'updated_at': updated_at,
-    #                            'created_at': created_at}
-    #             result.append(service_dic)
-    #     # return Response(result,
-    #     #                 status=status.HTTP_200_OK)
-    #     print services
-    #     print request.user.username
-    # return render_to_response('service_manage.html', {'username':
-    # request.user.username, 'show_list': services})
+        # def get_services(self, request, **kwargs):
+        #     logger.info('Getting infomation was called')
+        #     agent = request.GET.get('agent')
+        #     detail = request.GET.get('detail')
+        #     if detail == 'true':
+        #         result = swarm_client.containers()
+        #     else:
+        #         result = []
+        #         services = Service.objects.all()
+        #         for service in services:
+        #             name = service.service_name
+        #             instance_amount = service.instance_amount
+        #             image_name = service.image_name
+        #             updated_at = service.updated_at
+        #             created_at = service.created_at
+        #             service_dic = {'name': name, 'instance_amount': instance_amount,
+        #                            'image_name': image_name, 'updated_at': updated_at,
+        #                            'created_at': created_at}
+        #             result.append(service_dic)
+        #     # return Response(result,
+        #     #                 status=status.HTTP_200_OK)
+        #     print services
+        #     print request.user.username
+        # return render_to_response('service_manage.html', {'username':
+        # request.user.username, 'show_list': services})
 
 
 class Instance_client(object):
     model = Instance
 
-    def create_instance(self, service_name, instance_id):
+    def create_instance(self, service_name, instance_id, image_name, environment, hostname, command, volumes):
         instance_name = service_name + '_{}'.format(instance_id)
 
         logger.info('Create a docker instance: {}'.format(instance_name))
-        cmd_data = ["nginx",
-                    "-g",
-                    "daemon off;"]
-        image_data = "nginx"
-        env_data = ["FOO=bar", "BAZ=quux"]
-        labels_data = {
-            "com.example.vendor": "Acme",
-            "com.example.license": "GPL",
-            "com.example.version": "1.0"}
-        HostConfig = {"NetworkMode": "bridge"}
+        # cmd_data = ["nginx",
+        #             "-g",
+        #             "daemon off;"]
+        # labels_data = {
+        #     "com.example.vendor": "Acme",
+        #     "com.example.license": "GPL",
+        #     "com.example.version": "1.0"}
+        # HostConfig = {"NetworkMode": "bridge"}
         try:
 
-            r = swarm_client.create_container(image=image_data,
-                                              command=cmd_data,
-                                              name=instance_name)
+            r = swarm_client.create_container(image=image_name,
+                                              command=command,
+                                              name=instance_name,
+                                              # environment=environment,
+                                              hostname=hostname,
+                                              volumes=volumes
+                                              )
 
         except Exception as ex:
             logger.error("Error{}".format(ex))

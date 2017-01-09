@@ -46,17 +46,22 @@
   <div class="control-group">
     <label class="control-label">environment</label>
     <div class="controls">
-      <input type="text" class="input-block-level" name="created_at" placeholder="- TERM=xterm"></div>
+      <input type="text" class="input-block-level" name="environment" placeholder="- TERM=xterm"></div>
   </div>
   <div class="control-group">
     <label class="control-label">hostname</label>
     <div class="controls">
-      <input type="text" class="input-block-level" name="details" placeholder="haproxy.weitac.com"></div>
+      <input type="text" class="input-block-level" name="hostname" placeholder="haproxy.weitac.com"></div>
   </div>
   <div class="control-group">
     <label class="control-label">command</label>
     <div class="controls">
-      <input type="text" class="input-block-level" name="details" placeholder="/usr/sbin/init"></div>
+      <input type="text" class="input-block-level" name="command" placeholder="The command to be run in the container:/usr/sbin/init"></div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">volumes</label>
+    <div class="controls">
+      <input type="text" class="input-block-level" name="volumes" placeholder="./conf:/etc/haproxy"></div>
   </div>
 {#{% endif %}#}
 
