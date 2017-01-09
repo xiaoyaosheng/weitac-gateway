@@ -1,21 +1,13 @@
 {% extends 'job_manage.html' %}
 {% block showpage %}
-<form class="form-horizontal" enctype="multipart/form-data" role="form" method="post">
-{#<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">#}
-{#    <div class="row" style="height: 500px">#}
-{#           <input id="file-Portrait1" type="file">#}
-{#    </div>#}
-
-{#    <label class="control-label">Select File</label>#}
-{#<input id="input-1" type="file" class="file">#}
-{#    #}
 
 
-    <label class="control-label">Select File</label>
-<input id="input-1a" name="script" type="file" class="file" formenctype="multipart/form-data" data-show-preview="false">
+<form enctype="multipart/form-data" method="post" action="/job_upload/">
+    <div>
 
-{# <form enctype="multipart/form-data" method="post" action="/job_upload/">#}
-{#<input type="file" name="script" />#}
+        <label class="control-label">选择脚本</label>
+        <input type="file" name="script" class="file" data-show-preview="false"/>
+    </div>
 
   <div class="control-group">
     <div class="controls">
@@ -26,10 +18,9 @@
   </div>
 </form>
 
-{#      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->#}
-{#  <script src="http://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>#}
-{#  <script src="/static/js/bootstrap.min.js"></script>#}
-{#    bootstrap-fileinput/js/fileinput.min.js#}
-{#    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">#}
-{#<link href="path/to/css/star-rating.css" media="all" rel="stylesheet" type="text/css" />#}
+
+
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script src="/static/js/fileinput.min.js"></script>
+
 {% endblock %}
