@@ -1,14 +1,20 @@
-FROM ubuntu:trusty
-MAINTAINER wangtengyu wang_tengyu@weitac.com
+FROM docker.io/centos:7.2.1511
+MAINTAINER "wangtengyu" <wang_tengyu@weitac.com>
 
-RUN apt-get update && \
-    apt-get install -y libpq-dev python-pip python-dev nginx dnsutils && \
-    mkdir -p /var/log/weitac_gateway/ && \
+ENV TERM xterm
+ENV TZ "Asia/Shanghai"
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+RUN yum -y install epel-release
+RUN yum -y install python-pip
+RUN yum -y install libpq-dev python-devel nginx dnsutils mysql-devel gcc
+RUN mkdir -p /var/log/weitac_gateway/ && \
     chmod 775 /var/log/weitac_gateway/
 
+RUN pip install --upgrade pip
+RUN pip install supervisor
+RUN pip install supervisor-stdout
 RUN easy_install supervisor
-RUN easy_install supervisor-stdout 
-RUN pip install uwsgi
 RUN rm -rf /etc/nginx/sites-enabled/default
 
 # nginx config
@@ -28,5 +34,5 @@ COPY . /weitac_gateway
 RUN ln -s /weitac_gateway/conf/weitac_gateway_nginx.conf /etc/nginx/sites-enabled/weitac_gateway_nginx.conf
 RUN ln -s /weitac_gateway/conf/supervisord.conf /etc/supervisord.conf
 RUN chmod +x /weitac_gateway/run.sh
-
-CMD ["/weitac_gateway/run.sh"]
+CMD ["/usr/sbin/init"]
+#CMD ["/weitac_gateway/run.sh"]

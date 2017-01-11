@@ -38,6 +38,7 @@ def datetime_to_timestamp(t):
 def create_service(request, **kwargs):
     service_name = request.POST.get('service_name')
     instance_amount = request.POST.get('instance_amount')
+    # ip= request.POST.get('ip')
     if not instance_amount:
         instance_amount = '1'
     image_name = request.POST.get('image_name')
@@ -235,6 +236,19 @@ def delete_services(request):
     return render_to_response(
         'service_manage.html', {
             'username': request.user.username, 'show_list': services})
+
+
+def instance_manage(request):
+
+    service_name = request.GET.get('service_name')
+    print service_name
+    service=Service.objects.get(service_name=service_name)
+    instances=Instance.objects.filter(service=service)
+    print instances[0].name
+
+    return render_to_response(
+        'instance_manage.html', {
+            'username': request.user.username, 'show_list': instances})
 
 
 class ServiceViewSet(viewsets.ModelViewSet):

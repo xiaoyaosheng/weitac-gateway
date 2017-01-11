@@ -16,6 +16,7 @@ urlpatterns = patterns('',
                        url(r'^logout/$', 'login.views.logout'),
 
                        url(r'^services_manage/$', 'services.views.get_services'),
+                       url(r'^instance_manage/$', 'services.views.instance_manage'),
                        # url(r'^services_manage/$',
                        #     ServiceViewSet.as_view({'get': 'get_services',
                        #                             'post': 'delete_services',

@@ -2,24 +2,6 @@
 {% block content %}
 <div class="row-fluid">
 
-  <div class="span3">
-    <div class="well sidebar-nav">
-      <ul class="nav nav-list">
-        <li class="active">
-          <a href="/services_manage/">服务列表</a>
-        </li>
-        <li>
-          <a href="/create_service/">创建服务</a>
-        </li>
-        <li>
-          <a href="/update_service/">更新服务</a>
-        </li>
-{#        <li>#}
-{#          <a href="/update_services/">删除服务</a>#}
-{#        </li>#}
-      </ul>
-    </div>
-  </div>
 
   <div class="span9 well">
   {% block showpage %}
@@ -34,7 +16,7 @@
 
       <table class="table">
         <th></th>
-        <th>服务名</th>
+        <th>实例名</th>
         <th>实例数量</th>
         <th>镜像名</th>
         <th>创建时间</th>
@@ -45,12 +27,13 @@
           {% if show_list %}
             {% for service in show_list %}
             <tr>
-              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>
-              <td><a href="/instance_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>
-              <td>{{ service.instance_amount }}</td>
-              <td>{{ service.image_name }}</td>
+            <th></th>
+             <td>{{ service.name }}</td>
+              <td>{{ service.service_id }}</td>
               <td>{{ service.created_at }}</td>
               <td>{{ service.details }}</td>
+                <td>{{ service.continer_id }}</td>
+
             </tr>
             {% endfor %}
             <button type="submit" class="btn">删除</button>
