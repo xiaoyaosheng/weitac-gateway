@@ -1,64 +1,64 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row-fluid">
+    <div class="row-fluid">
 
 
-  <div class="span9 well">
-  {% block showpage %}
-    <form class="form-horizontal" role="form" method="get" action="/search_ip/">
-      <div class="control-group">
-        <div class="controls">
-          <input type="text" class="input" name="search">
-          <button type="submit" class="btn">查询</button>
-          </div>
-      </div>
-    </form>
-
-      <table class="table">
-        <th></th>
-        <th>实例名</th>
-        <th>实例数量</th>
-        <th>镜像名</th>
-        <th>创建时间</th>
-        <th>details</th>
-        <tr>{{search_error}}</tr>
-        <form class="form-horizontal" role="form" method="post">
-        <!--show ip list-->
-          {% if show_list %}
-            {% for service in show_list %}
-            <tr>
-            <th></th>
-             <td>{{ service.name }}</td>
-              <td>{{ service.service_id }}</td>
-              <td>{{ service.created_at }}</td>
-              <td>{{ service.details }}</td>
-                <td>{{ service.continer_id }}</td>
-
-            </tr>
-            {% endfor %}
-            <button type="submit" class="btn">删除</button>
-          {%endif%}
-
-        </form>
-      </table>
+        <div class="span9 well">
+            {% block showpage %}
 
 
-    {% if paginator.page_range %}
-    <ul class="pagination">
-      {% if show_list.has_previous %}
-      <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a></li>
-      {% endif %}
-      {% for i in paginator.page_range %}
-      <li><a href="?page={{i}}&search={{ s_text }}" name="page">{{ i }}</a></li>
-      {%endfor%}
-      {% if show_list.has_next %}
-      <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
-      {% endif %}
-    </ul>
-    {% endif %}
+                <table class="table">
 
-  {% endblock %}
-  </div>
+                    <th>实例名</th>
+                    <th>容器id</th>
+                    <th>ip</th>
+                    <tr>{{ search_error }}</tr>
+                    <form class="form-horizontal" role="form" method="post">
+                        <!--show ip list-->
+                        {% if show_list %}
+                            {% for service in show_list %}
+                                <tr>
+                                    <td>{{ service.name }}</td>
+{#                                    <td>{{ service.details }}</td>#}
+                                    <td>{{ service.continer_id }}</td>
+                                    {% if service.continer_ip %}
 
-</div>
+                                        <td>{{ service.continer_ip }}</td>
+                                    {% else %}
+                                        <td><input type="text" class="input" name={{ service.name }}></td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <p>{{ add_error }}</p>
+                                <button type="submit" class="btn">提交</button>
+                                <a class="btn" href="/job_manage/">取消</a>
+                            </div>
+                        </div>
+                    </form>
+                </table>
+
+
+                {% if paginator.page_range %}
+                    <ul class="pagination">
+                        {% if show_list.has_previous %}
+                            <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            <li><a href="?page={{ i }}&search={{ s_text }}" name="page">{{ i }}</a></li>
+                        {% endfor %}
+                        {% if show_list.has_next %}
+                            <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+            {% endblock %}
+        </div>
+
+    </div>
 {% endblock %}

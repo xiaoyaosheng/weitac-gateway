@@ -12,6 +12,7 @@ from django.utils import timezone
 from services.serializers import ServiceSerializer
 from utils import service_DBclient
 from django.shortcuts import render_to_response
+from jobs.views import call_agent_change_ip
 from django.http import HttpRequest, QueryDict
 from django.contrib.auth.decorators import login_required
 from rest_framework.parsers import JSONParser, FormParser
@@ -61,7 +62,7 @@ def create_service(request, **kwargs):
 
         data = {'service_name': service_name,
                 'instance_amount': instance_amount,
-                'image_name': 'ss', 'details': 'dd'}
+                'image_name': image_name, 'details': 'dd'}
         # if isinstance(request.DATA, QueryDict):
         #     data = {'service_name': service_name,
         #             'instance_amount': instance_amount,
@@ -239,17 +240,34 @@ def delete_services(request):
 
 
 def instance_manage(request):
-
+    # print request
     service_name = request.GET.get('service_name')
-    print service_name
+    ips = request.POST
+    for instance_name in ips :
+
+        ip=ips[instance_name]
+        try:
+            change_ip(instance_name,ip)
+        except Exception as e:
+            logger.error(e)
     service=Service.objects.get(service_name=service_name)
     instances=Instance.objects.filter(service=service)
-    print instances[0].name
+    # print instances[0].name
 
     return render_to_response(
         'instance_manage.html', {
             'username': request.user.username, 'show_list': instances})
 
+
+def change_ip(instance_name,ip):
+    try:
+        call_agent_change_ip(instance_name,ip)
+    except Exception as e:
+        logger.error(e)
+        return False
+    print instance_name,ip
+    service_DBclient.change_db_ip(instance_name,ip)
+    return True
 
 class ServiceViewSet(viewsets.ModelViewSet):
     model = Service

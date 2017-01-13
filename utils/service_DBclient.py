@@ -1,6 +1,6 @@
 import time
 from django.utils import timezone
-
+from services.models import Instance
 
 def datetime_to_timestamp(t):
     stamp = int(time.mktime(t.timetuple()))
@@ -19,3 +19,9 @@ def save(dic_info):
     for instance in instance_list:
         instance.service = service
         instance.save()
+
+
+def change_db_ip(instance_name,ip):
+    instance=Instance.objects.get(name=instance_name)
+    instance.continer_ip=ip
+    instance.save()

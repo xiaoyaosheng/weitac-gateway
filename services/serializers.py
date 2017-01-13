@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from services.models import Service, IpInfo
+from services.models import Service
 from django.contrib.auth.models import User
 
 
