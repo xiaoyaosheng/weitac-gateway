@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+
+  <link href="/static/css/pagination.css" rel="stylesheet">
+
+ <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+       <label class="control-label">Select File</label>
+ <form enctype="multipart/form-data" method="post" action="/job_upload/">
+<input type="file" name="script" class="file"/>
+
+  <div class="control-group">
+    <div class="controls">
+      <p>{{ add_error }}</p>
+      <button type="submit" class="btn">提交</button>
+      <a class="btn" href="/job_manage/">取消</a>
+    </div>
+  </div>
+</form>
+
+
+
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+       <script src="/static/js/fileinput.min.js"></script>
+</body>
+
+</html>
