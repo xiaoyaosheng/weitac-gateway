@@ -8,5 +8,6 @@ class Job(models.Model):
 
     updated_at = models.DateTimeField(auto_now=True)
 
-    # info = models.BinaryField(default={}, blank=True)
-    info = models.CharField(max_length=512)
+    info = models.BinaryField(default={}, blank=True)
+    # info = models.CharField(max_length=512)
+    describe=models.CharField(max_length=512,blank=True)

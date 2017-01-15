@@ -5,5 +5,5 @@
 #    /usr/bin/python /weitac_gateway/manage.py migrate --settings=weitac_gateway.settings
 #fi
 
-/usr/local/bin/supervisord --nodaemon # Run supervisord in the foreground
-
+#/usr/local/bin/supervisord --nodaemon # Run supervisord in the foreground
+python manage.py runserver 0.0.0.0:8080

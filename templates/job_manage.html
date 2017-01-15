@@ -1,79 +1,79 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row-fluid">
+    <div class="row-fluid">
 
-  <div class="span3">
-    <div class="well sidebar-nav">
-      <ul class="nav nav-list">
-        <li class="active">
-          <a href="/job_manage/">脚本列表</a>
-        </li>
-        <li>
-          <a href="/job_upload/">上传脚本</a>
-        </li>
-        <li>
-          <a href="/job_run/">运行脚本</a>
-        </li>
-{#        <li>#}
-{#          <a href="/update_services/">删除服务</a>#}
-{#        </li>#}
-      </ul>
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="active">
+                        <a href="/job_manage/">脚本列表</a>
+                    </li>
+                    <li>
+                        <a href="/job_upload/">上传脚本</a>
+                    </li>
+                    <li>
+                        <a href="/job_run/">运行脚本</a>
+                    </li>
+                    {#        <li>#}
+                    {#          <a href="/update_services/">删除服务</a>#}
+                    {#        </li>#}
+                </ul>
+            </div>
+        </div>
+
+        <div class="span9 well">
+            {% block showpage %}
+                <form class="form-horizontal" role="form" method="get" action="/search_ip/">
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="text" class="input" name="search">
+                            <button type="submit" class="btn">查询</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table">
+                    <th></th>
+                    <th>脚本名</th>
+                    <th>更新时间</th>
+                    <th>脚本功能</th>
+                    {#        <tr>{{search_error}}</tr>#}
+                    <form class="form-horizontal" role="form" method="post">
+                        <!--show ip list-->
+                        {% if show_list %}
+                            {% for script in show_list %}
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox" name="post_jobs"
+                                               value="{{ script.job_name }}"></td>
+                                    <td>{{ script.job_name }}</td>
+                                    <td>{{ script.updated_at }}</td>
+                                    <td>{{ script.describe }}</td>
+                                </tr>
+                            {% endfor %}
+                                        <button type="submit" class="btn">删除</button>
+                        {% endif %}
+
+                    </form>
+                </table>
+
+
+                {% if paginator.page_range %}
+                    <ul class="pagination">
+                        {% if show_list.has_previous %}
+                            <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            <li><a href="?page={{ i }}&search={{ s_text }}" name="page">{{ i }}</a></li>
+                        {% endfor %}
+                        {% if show_list.has_next %}
+                            <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+            {% endblock %}
+        </div>
+
     </div>
-  </div>
-
-  <div class="span9 well">
-  {% block showpage %}
-    <form class="form-horizontal" role="form" method="get" action="/search_ip/">
-      <div class="control-group">
-        <div class="controls">
-          <input type="text" class="input" name="search">
-          <button type="submit" class="btn">查询</button>
-          </div>
-      </div>
-    </form>
-
-      <table class="table">
-        <th></th>
-        <th>脚本名</th>
-        <th>更新时间</th>
-        <th>details</th>
-{#        <tr>{{search_error}}</tr>#}
-        <form class="form-horizontal" role="form" method="post">
-        <!--show ip list-->
-          {% if show_list %}
-            {% for script in show_list %}
-            <tr>
-{#              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>#}
-{#              <td><a href="/job_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>#}
-                <th></th>
-                <td>{{ script.job_name }}</td>
-              <td>{{ script.updated_at }}</td>
-              <td>{{ script.info }}</td>
-            </tr>
-            {% endfor %}
-{#            <button type="submit" class="btn">删除</button>#}
-          {%endif%}
-
-        </form>
-      </table>
-
-
-    {% if paginator.page_range %}
-    <ul class="pagination">
-      {% if show_list.has_previous %}
-      <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a></li>
-      {% endif %}
-      {% for i in paginator.page_range %}
-      <li><a href="?page={{i}}&search={{ s_text }}" name="page">{{ i }}</a></li>
-      {%endfor%}
-      {% if show_list.has_next %}
-      <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
-      {% endif %}
-    </ul>
-    {% endif %}
-
-  {% endblock %}
-  </div>
-
-</div>
 {% endblock %}

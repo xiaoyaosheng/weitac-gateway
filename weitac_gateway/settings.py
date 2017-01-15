@@ -58,25 +58,25 @@ WSGI_APPLICATION = 'weitac_gateway.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         # 'NAME': os.path.join(BASE_DIR, 'user_data'),
-#         'NAME': 'weitac_gateway',
-#         'ENGINE': 'django.db.backends.mysql',
-#         'USER': 'root',
-#         'PASSWORD': '111111',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
-DATABASES = {'default': {
-    'ENGINE': os.getenv('') or 'django.db.backends.sqlite3',
-    'NAME': os.getenv('DB_NAME') or 'tmp.db',
-    'USER': os.getenv('DB_USER') or '',
-    'PASSWORD': os.getenv('DB_PASSWORD') or '',
-    'HOST': os.getenv('DB_HOST') or '',
-    'PORT': os.getenv('DB_PORT') or '',
-}}
+DATABASES = {
+    'default': {
+        # 'NAME': os.path.join(BASE_DIR, 'user_data'),
+        'NAME': 'weitac_gateway',
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'root',
+        'PASSWORD': '111111',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+# DATABASES = {'default': {
+#     'ENGINE': os.getenv('') or 'django.db.backends.sqlite3',
+#     'NAME': os.getenv('DB_NAME') or 'tmp.db',
+#     'USER': os.getenv('DB_USER') or '',
+#     'PASSWORD': os.getenv('DB_PASSWORD') or '',
+#     'HOST': os.getenv('DB_HOST') or '',
+#     'PORT': os.getenv('DB_PORT') or '',
+# }}
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

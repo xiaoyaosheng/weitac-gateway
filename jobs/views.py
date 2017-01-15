@@ -15,23 +15,19 @@ from django import forms
 import json
 from services.models import Agent
 from rest_framework.parsers import JSONParser, FormParser
-
-
-# add.delay(2, 2)
+logger = logging.getLogger(__name__)
 
 
 def job_manage(request):
     if request.method == 'POST':
-        render_to_response(
-            'job_manage.html', {
-                'username': request.user.username})
+        # print request
+        delete_job(request)
 
-    else:
-        scripts = Job.objects.all()
-        print scripts[0].job_name
-        return render_to_response(
-            'job_manage.html', {
-                'username': request.user.username, 'show_list': scripts})
+    scripts = Job.objects.all()
+    # print scripts[0].job_name
+    return render_to_response(
+        'job_manage.html', {
+            'username': request.user.username, 'show_list': scripts})
 
 
 # def job_upload(request):
@@ -57,15 +53,24 @@ def job_upload(request):
     if request.method == 'POST':
         # script= request.POST.get('script')
         # print type(script)
-        # print request
+        print request
         myFile = request.FILES.get('script', None)
+        name = request.POST.get('name')
+        describe=request.POST.get('describe')
+        print name,describe
+        if name:
+            save_name=name
+        else:
+            save_name=myFile
         # print(myFile._size)  # 文件大小字节数
-        # print type(myFile)
+        if Job.objects.filter(job_name=myFile).exists():
+            return render_to_response('400.html',{'info':'脚本已经存在'})
         data = myFile.read()
         job_obj = Job()
 
-        job_obj.job_name = myFile
+        job_obj.job_name = save_name
         job_obj.info = data
+        job_obj.describe=describe
         job_obj.save()
         return render_to_response(
             'job_upload.html', {
@@ -120,6 +125,20 @@ def job_run(request):
                     'username':
                         request.user.username, 'scripts': scripts,
                     'agents': agents, 'choiced_script': job_name})
+
+
+def delete_job(request):
+    post_jobs = request.POST.getlist('post_jobs')
+    for job_name in post_jobs:
+        logger.debug('Start delete script :{}'.format(job_name))
+        try:
+            job_obj = Job.objects.get(job_name=job_name)
+            job_obj.delete()
+        except Exception as ex:
+            # return Response(
+            #     'Service dose not exit. {}'.format(ex),
+            #     status=status.HTTP_400_BAD_REQUEST)
+            return render_to_response('400.html')
 
 
 @task()
