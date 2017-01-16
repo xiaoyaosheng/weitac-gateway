@@ -1,126 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>main page</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="">
-  <meta name="author" content="">
+    <meta charset="utf-8">
+    <title>main page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <!-- Le styles -->
-{#<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">#}
-{#	<script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>#}
-{#	<script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
-{#<link href="/static/css/fileinput.min.css" rel="stylesheet">#}
-{#  <link href="/static/css/bootstrap-2.3.2.css" rel="stylesheet">#}
-{#    <link href="/static/css/bootstrap.css" rel="stylesheet">#}
-  <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+    <!-- Le styles -->
+    <!--  <link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <!--	<script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script> -->
+    <!--	<script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+    <!-- <link href="/static/css/fileinput.min.css" rel="stylesheet"> -->
+    <!--  <link href="/static/css/bootstrap-2.3.2.css" rel="stylesheet"> -->
+    <!--    <link href="/static/css/bootstrap.css" rel="stylesheet">  -->
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
 
-  <link href="/static/css/pagination.css" rel="stylesheet">
-{#<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">#}
- <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/pagination.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
- <link href="/static/css/fileinput.min.css" rel="stylesheet">
+    <link href="/static/css/fileinput.min.css" rel="stylesheet">
 
-  <style type="text/css">
-      body {
-        padding-top: 60px;
-        padding-bottom: 40px;
-      }
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-
-      @media (max-width: 980px) {
-        /* Enable use of floated navbar text */
-        .navbar-text.pull-right {
-          float: none;
-          padding-left: 5px;
-          padding-right: 5px;
+    <style type="text/css">
+        body {
+            padding-top: 60px;
+            padding-bottom: 40px;
         }
-      }
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
     </style>
 
-  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-  <script src="../assets/js/html5shiv.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+{#  <script src="../assets/js/html5shiv.js"></script>#}
   <![endif]-->
 
-  <!-- Fav and touch icons -->
+    <!-- Fav and touch icons -->
 
 </head>
 
 <body>
 
-  <div class="navbar navbar-inverse navbar-fixed-top">
+<div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
-      <div class="container">
-        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="brand" href="#">Weitac运维管理平台</a>
-{#        <div class="nav-collapse collapse">#}
+        <div class="container">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">Weitac运维管理平台</a>
+            {#        <div class="nav-collapse collapse">#}
 
-          <ul class="nav">
-            <li>
-              <a href="/services_manage/">服务管理</a>
-            </li>
-            <li>
-              <a href="/job_manage/">任务管理</a>
-            </li>
-            <li>
-              <a href="#">服务监控</a>
-            </li>
-          </ul>
-          <ul class="nav pull-right">
-            <li class="divider-vertical">
-              <a>{{username}}</a>
-            </li>
-            <li class="dropdown">
-              <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                后台管理 <strong class="caret"></strong>
-              </a>
-              <ul class="dropdown-menu">
+            <ul class="nav">
                 <li>
-                  <a href="/admin/">用户管理</a>
+                    <a href="/services_manage/">服务管理</a>
                 </li>
                 <li>
-                  <a href="#">修改密码</a>
+                    <a href="/job_manage/">任务管理</a>
                 </li>
-                <li class="divider"></li>
                 <li>
-                  <a href="/logout/">退出</a>
+                    <a href="#">服务监控</a>
                 </li>
-              </ul>
-            </li>
-          </ul>
+            </ul>
+            <ul class="nav pull-right">
+                <li class="divider-vertical">
+                    <a>{{ username }}</a>
+                </li>
+                <li class="dropdown">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        后台管理 <strong class="caret"></strong>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/admin/">用户管理</a>
+                        </li>
+                        <li>
+                            <a href="#">修改密码</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="/logout/">退出</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
         <!--/.nav-collapse --> </div>
-    </div>
-{#  </div>#}
+</div>
+<!--  </div>  -->
 
-  <div class="container">
+<div class="container">
     {% block content %}
 
-      {% endblock %}
+    {% endblock %}
     <hr>
 
     <footer>
-      <p>&copy; By weitac 2017</p>
+        <p>&copy; By weitac 2017</p>
     </footer>
 
-  </div>
-  <!--/.fluid-container-->
+</div>
+<!--/.fluid-container-->
 
-  <!-- Le javascript
-    ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="/static/js/jquery-3.1.1.min.js"></script>
-  <script src="/static/js/bootstrap-3.3.7.js"></script>
-{#<script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>#}
-{#	<script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+<!-- Le javascript
+  ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script src="/static/js/bootstrap-3.3.7.js"></script>
+<!-- <script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>   -->
+<!-- <script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>   -->
 
 </body>
 </html>

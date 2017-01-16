@@ -103,8 +103,11 @@ def job_run(request):
 
             headers = {'Accept': 'application/json'}
             # r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
-            print script
-            add_celery_job.delay(script,script_name, ip_addr)
+            try:
+                add_celery_job.delay(script,script_name, ip_addr)
+            except Exception as e:
+                logger.error(e)
+                return render_to_response('400.html', {'info': '异步组件错误'})
             # r = requests.post('http://10.6.168.161:8000', data=script, headers=headers)
 
         return render_to_response('job_manage.html')
@@ -145,7 +148,8 @@ def delete_job(request):
 def add_celery_job(script, script_name,ip_addr):
     headers = {'Accept': 'application/json'}
     r = requests.post('http://{0}:8000/{1}'.format(ip_addr,script_name), data=script, headers=headers)
-    # print r.text
+    print 'success'
+    print r
 
     # return r.text
 

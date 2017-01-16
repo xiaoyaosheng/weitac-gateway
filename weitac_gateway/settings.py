@@ -90,6 +90,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'weitac_gateway')
 STATIC_URL = '/static/'
 # template
 TEMPLATE_DIRS = (

@@ -18,7 +18,7 @@ RUN mkdir -p /var/log/weitac_gateway
 RUN mkdir -p /var/log/uwsgi/
 
 WORKDIR /weitac_gateway
-
+ENV C_FORCE_ROOT="true"
 EXPOSE 8080
 
 COPY requirements.txt /
