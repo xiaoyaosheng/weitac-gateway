@@ -2,10 +2,11 @@ FROM ubuntu:16.04
 MAINTAINER wangtengyu wang_tengyu@weitac.com
 
 RUN apt-get update && \
-    apt-get install -y libpq-dev python-pip python-dev nginx dnsutils libmysqlclient-dev && \
+    apt-get install -y libpq-dev python-pip python-dev nginx dnsutils libmysqlclient-dev rabbitmq-server && \
     mkdir -p /var/log/weitac_gateway/ && \
     chmod 775 /var/log/weitac_gateway/
 
+RUN pip install --upgrade pip
 RUN easy_install supervisor
 RUN easy_install supervisor-stdout 
 RUN pip install uwsgi
