@@ -7,7 +7,7 @@ import services
 
 urlpatterns = patterns('',
                        # Examples:
-                       # url(r'^$', 'weitac_gateway.views.home', name='home'),
+                       # url(r'^$', 'weitac-gateway.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
                        url(r'^admin/', admin.site.urls),
                        url(r'^$', 'login.views.index'),
@@ -17,6 +17,7 @@ urlpatterns = patterns('',
 
                        url(r'^services_manage/$', 'services.views.get_services'),
                        url(r'^instance_manage/$', 'services.views.instance_manage'),
+
                        # url(r'^services_manage/$',
                        #     ServiceViewSet.as_view({'get': 'get_services',
                        #                             'post': 'delete_services',
@@ -27,7 +28,7 @@ urlpatterns = patterns('',
                        url(r'^job_manage/$', 'jobs.views.job_manage'),
                        url(r'^job_upload/$', 'jobs.views.job_upload'),
                        url(r'^job_run/$', 'jobs.views.job_run'),
-
+                       url(r'^job_periodictask/$', 'jobs.views.job_periodictask'),
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),
                        # url(r'^create_service/$',

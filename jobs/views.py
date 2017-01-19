@@ -144,6 +144,13 @@ def delete_job(request):
             return render_to_response('400.html')
 
 
+def job_periodictask(request):
+    if request.method == 'POST':
+        pass
+    else:
+        return render_to_response('job_periodictask.html')
+
+
 @task()
 def add_celery_job(script, script_name,ip_addr):
     headers = {'Accept': 'application/json'}

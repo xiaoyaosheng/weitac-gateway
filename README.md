@@ -2,14 +2,14 @@
 
 get the healthy info of instance of marathon and user's order of stop/delete app for billing usage.
 
-## weitac_gateway deployment
+## weitac-gateway deployment
 
 ### install dependency
 
 	sudo apt-get update
 	sudo apt-get install -y git python-pip python-dev build-essential python-psycopg2
-	git clone https://username@bitbucket.org/mathildetech/weitac_gateway.git
-	cd weitac_gateway
+	git clone https://username@bitbucket.org/mathildetech/weitac-gateway.git
+	cd weitac-gateway
 	sudo pip install -r requirements.txt
 	sudo mkdir /var/log/mathilde/
 	sudo chown ubuntu:ubuntu /var/log/mathilde/
@@ -23,15 +23,15 @@ modify DATABASES settings
 sudo python manage.py migrate
 
 ### test
-	cd /home/ubuntu/weitac_gateway/test
+	cd /home/ubuntu/weitac-gateway/test
 	python event_tests.py
 
 ### add cron:
 
-	@reboot /usr/bin/python /home/ubuntu/weitac_gateway/manage.py runserver 0.0.0.0:8080
+	@reboot /usr/bin/python /home/ubuntu/weitac-gateway/manage.py runserver 0.0.0.0:8080
 
 ### subscribe eventbus from marathon
 
-	curl -X POST -H "Content-Type:application/json" -d '{}' https://marathon.alauda.club:8443/v2/eventSubscriptions?callbackUrl=https://weitac_gateway.alauda.club:8443/v1/instance/events/
+	curl -X POST -H "Content-Type:application/json" -d '{}' https://marathon.alauda.club:8443/v2/eventSubscriptions?callbackUrl=https://weitac-gateway.alauda.club:8443/v1/instance/events/
 	
-	docker run -d -p 8080:8080 --name weitac_gatway weitac_gatway
+	docker run -d -p 8080:8080 --name weitac-gatway weitac-gatway

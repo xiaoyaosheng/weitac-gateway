@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>增加 periodic task | Django 站点管理员</title>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css"/>
+    <!--[if lte IE 7]>
+    <link rel="stylesheet" type="text/css" href="static/admin/css/ie.css"/><![endif]-->
+
+    <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
+    <script type="text/javascript">window.__admin_utc_offset__ = "28800";</script>
+
+    <script type="text/javascript" src="/admin/jsi18n/"></script>
+    <script type="text/javascript" src="/static/admin/js/core.js"></script>
+    <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+    <script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+    <script type="text/javascript" src="/static/admin/js/actions.js"></script>
+    <script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+    <script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+    <script type="text/javascript" src="/static/admin/js/collapse.js"></script>
+
+    <meta name="robots" content="NONE,NOARCHIVE"/>
+</head>
+
+
+<body class=" app-djcelery model-periodictask change-form">
+
+<!-- Container -->
+<div id="container">
+
+
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+
+            <h1 id="site-name"><a href="/admin/">计划任务 管理</a></h1>
+
+        </div>
+
+        <div id="user-tools">
+
+            欢迎，
+            <strong>weitac</strong>.
+
+
+            <a href="/admin/password_change/">修改密码</a> /
+
+            <a href="/admin/logout/">注销</a>
+
+        </div>
+
+
+    </div>
+    <!-- END Header -->
+
+    <div class="breadcrumbs">
+        <a href="/admin/">首页</a>
+        &rsaquo; <a href="/admin/djcelery/">Djcelery</a>
+        &rsaquo; <a href="/admin/djcelery/periodictask/">Periodic tasks</a>
+        &rsaquo; 增加 periodic task
+    </div>
+
+
+    <!-- Content -->
+    <div id="content" class="colM">
+
+        <h1>增加 periodic task</h1>
+        <div id="content-main">
+
+
+            <form enctype="multipart/form-data" action="" method="post" id="periodictask_form" novalidate><input
+                    type='hidden' name='csrfmiddlewaretoken' value='pfk8eSe58G2YcJE5wSo8CSFy7w2d5LXk'/>
+                <div>
+
+
+                    <fieldset class="module aligned extrapretty wide">
+
+
+                        <div class="form-row field-name">
+
+
+                            <div>
+
+
+                                <label class="required" for="id_name">名称:</label>
+
+                                <input class="vTextField" id="id_name" maxlength="200" name="name" type="text"/>
+
+
+                                <p class="help">Useful description</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-regtask">
+
+
+                            <div>
+
+
+                                <label for="id_regtask">Task (registered):</label>
+
+                                <select id="id_regtask" name="regtask">
+                                    <option value="" selected="selected"></option>
+                                    <option value="jobs.tasks.add">jobs.tasks.add</option>
+                                    <option value="jobs.views.add_celery_job">jobs.views.add_celery_job</option>
+                                </select>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-task">
+
+
+                            <div>
+
+
+                                <label for="id_task">Task (custom):</label>
+
+                                <input id="id_task" maxlength="200" name="task" type="text"/>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-enabled">
+
+
+                            <div class="checkbox-row">
+
+
+                                <input checked="checked" id="id_enabled" name="enabled" type="checkbox"/><label
+                                    class="vCheckboxLabel" for="id_enabled">Enabled</label>
+
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <fieldset class="module aligned extrapretty wide">
+                        <h2>Schedule</h2>
+
+
+                        <div class="form-row field-interval">
+
+
+                            <div>
+
+
+                                <label for="id_interval">Interval:</label>
+
+                                <select id="id_interval" name="interval">
+                                    <option value="" selected="selected">---------</option>
+                                </select><a href="/admin/djcelery/intervalschedule/add/?_to_field=id"
+                                            class="add-another" id="add_id_interval"
+                                            onclick="return showAddAnotherPopup(this);"> <img
+                                    src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="添加另一个"/></a>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-crontab">
+
+
+                            <div>
+
+
+                                <label for="id_crontab">Crontab:</label>
+
+                                <select id="id_crontab" name="crontab">
+                                    <option value="" selected="selected">---------</option>
+                                </select><a href="/admin/djcelery/crontabschedule/add/?_to_field=id" class="add-another"
+                                            id="add_id_crontab" onclick="return showAddAnotherPopup(this);"> <img
+                                    src="/static/admin/img/icon_addlink.gif" width="10" height="10" alt="添加另一个"/></a>
+
+
+                                <p class="help">Use one of interval/crontab</p>
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <fieldset class="module aligned extrapretty wide collapse">
+                        <h2>Arguments</h2>
+
+
+                        <div class="form-row field-args">
+
+
+                            <div>
+
+
+                                <label for="id_args">Arguments:</label>
+
+                                <textarea class="vLargeTextField" cols="40" id="id_args" name="args" rows="10">
+[]</textarea>
+
+
+                                <p class="help">JSON encoded positional arguments</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-kwargs">
+
+
+                            <div>
+
+
+                                <label for="id_kwargs">Keyword arguments:</label>
+
+                                <textarea class="vLargeTextField" cols="40" id="id_kwargs" name="kwargs" rows="10">
+{}</textarea>
+
+
+                                <p class="help">JSON encoded keyword arguments</p>
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <fieldset class="module aligned extrapretty wide collapse">
+                        <h2>Execution Options</h2>
+
+
+                        <div class="form-row field-expires">
+
+
+                            <div>
+
+
+                                <label for="id_expires_0">Expires:</label>
+
+                                <p class="datetime">日期： <input class="vDateField" id="id_expires_0" name="expires_0"
+                                                               size="10" type="text"/><br/>时间： <input class="vTimeField"
+                                                                                                      id="id_expires_1"
+                                                                                                      name="expires_1"
+                                                                                                      size="8"
+                                                                                                      type="text"/></p>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-queue">
+
+
+                            <div>
+
+
+                                <label for="id_queue">Queue:</label>
+
+                                <input class="vTextField" id="id_queue" maxlength="200" name="queue" type="text"/>
+
+
+                                <p class="help">Queue defined in CELERY_QUEUES</p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-exchange">
+
+
+                            <div>
+
+
+                                <label for="id_exchange">Exchange:</label>
+
+                                <input class="vTextField" id="id_exchange" maxlength="200" name="exchange" type="text"/>
+
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-row field-routing_key">
+
+
+                            <div>
+
+
+                                <label for="id_routing_key">Routing key:</label>
+
+                                <input class="vTextField" id="id_routing_key" maxlength="200" name="routing_key"
+                                       type="text"/>
+
+
+                            </div>
+
+                        </div>
+
+                    </fieldset>
+
+
+                    <div class="submit-row">
+                        <input type="submit" value="保存" class="default" name="_save"/>
+
+
+                        <input type="submit" value="保存并增加另一个" name="_addanother"/>
+                        <input type="submit" value="保存并继续编辑" name="_continue"/>
+                    </div>
+
+
+                    <script type="text/javascript">
+                        (function ($) {
+                            $(document).ready(function () {
+                                $('form#periodictask_form :input:visible:enabled:first').focus()
+                            });
+                        })(django.jQuery);
+                    </script>
+
+
+                    <script type="text/javascript">
+                        (function ($) {
+                            var field;
+
+
+                        })(django.jQuery);
+                    </script>
+
+
+                </div>
+            </form>
+        </div>
+
+
+        <br class="clear"/>
+    </div>
+    <!-- END Content -->
+
+    <div id="footer"></div>
+</div>
+<!-- END Container -->
+
+</body>
+</html>

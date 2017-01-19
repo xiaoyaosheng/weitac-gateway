@@ -1,14 +1,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import djcelery
-djcelery.setup_loader()
-BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'America/Los_Angeles'
-CELERY_ENABLE_UTC = True
-CELERY_IMPORTS = ("jobs.tasks","jobs.views")
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -51,9 +43,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 # 'django.middleware.csrf.CsrfViewMiddleware',
-ROOT_URLCONF = 'weitac_gateway.urls'
+ROOT_URLCONF = 'weitac-gateway.urls'
 
-WSGI_APPLICATION = 'weitac_gateway.wsgi.application'
+WSGI_APPLICATION = 'weitac-gateway.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
@@ -65,7 +57,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'USER': 'root',
         'PASSWORD': '111111',
-        'HOST': '10.6.168.161',
+        # 'HOST': '10.6.168.161',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -91,7 +84,7 @@ USE_L10N = True
 USE_TZ = True
 
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'weitac_gateway')
+# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'weitac-gateway')
 STATIC_URL = '/static/'
 # template
 TEMPLATE_DIRS = (
@@ -104,7 +97,7 @@ STATICFILES_DIRS = (
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-LOG_PATH = '/var/log/weitac_gateway/'
+LOG_PATH = '/var/log/weitac-gateway/'
 
 LOGGING = {
     'version': 1,
@@ -164,3 +157,20 @@ LOGGING = {
         },
     }
 }
+
+# config of djcelery
+djcelery.setup_loader()
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+CELERY_IMPORTS = ("jobs.tasks", "jobs.views")
+
+# CELERYBEAT_SCHEDULE = {
+#    'add-every-3-minutes': {
+#        'task': 'mrs_app.my_celery.tasks.monthly_reading_task',
+#        'schedule': timedelta(minutes=3)
+#    },
+# }
