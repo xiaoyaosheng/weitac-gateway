@@ -15,6 +15,7 @@ from django import forms
 import json
 from services.models import Agent
 from rest_framework.parsers import JSONParser, FormParser
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,21 +57,21 @@ def job_upload(request):
         print request
         myFile = request.FILES.get('script', None)
         name = request.POST.get('name')
-        describe=request.POST.get('describe')
-        print name,describe
+        describe = request.POST.get('describe')
+        print name, describe
         if name:
-            save_name=name
+            save_name = name
         else:
-            save_name=myFile
+            save_name = myFile
         # print(myFile._size)  # 文件大小字节数
         if Job.objects.filter(job_name=myFile).exists():
-            return render_to_response('400.html',{'info':'脚本已经存在'})
+            return render_to_response('400.html', {'info': '脚本已经存在'})
         data = myFile.read()
         job_obj = Job()
 
         job_obj.job_name = save_name
         job_obj.info = data
-        job_obj.describe=describe
+        job_obj.describe = describe
         job_obj.save()
         return render_to_response(
             'job_upload.html', {
@@ -104,11 +105,11 @@ def job_run(request):
             headers = {'Accept': 'application/json'}
             # r = requests.post('http://127.0.0.1:8000', data=script, headers=headers)
             try:
-                add_celery_job.delay(script,script_name, ip_addr)
+                add_celery_job.delay(script, script_name, ip_addr)
             except Exception as e:
                 logger.error(e)
                 return render_to_response('400.html', {'info': '异步组件错误'})
-            # r = requests.post('http://10.6.168.161:8000', data=script, headers=headers)
+                # r = requests.post('http://10.6.168.161:8000', data=script, headers=headers)
 
         return render_to_response('job_manage.html')
 
@@ -152,16 +153,16 @@ def job_periodictask(request):
 
 
 @task()
-def add_celery_job(script, script_name,ip_addr):
+def add_celery_job(script, script_name, ip_addr):
     headers = {'Accept': 'application/json'}
-    r = requests.post('http://{0}:8000/{1}'.format(ip_addr,script_name), data=script, headers=headers)
+    r = requests.post('http://{0}:8000/{1}'.format(ip_addr, script_name), data=script, headers=headers)
     print 'success'
     print r
 
     # return r.text
 
 
-def call_agent_change_ip(instance_name,ip):
+def call_agent_change_ip(instance_name, ip):
     # headers = {'Accept': 'application/json'}
     # r = requests.post('http://{0}:8000/{1}'.format(ip_addr, script_name), data=script, headers=headers)
     pass
