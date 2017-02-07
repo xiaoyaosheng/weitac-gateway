@@ -14,9 +14,10 @@ class Migration(migrations.Migration):
             name='Job',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('service_name', models.CharField(max_length=512)),
+                ('job_name', models.CharField(max_length=512)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('info', models.FileField(default={}, upload_to=b'', blank=True)),
+                ('info', models.BinaryField(default={}, blank=True)),
+                ('describe', models.CharField(max_length=512, blank=True)),
             ],
             options={
             },

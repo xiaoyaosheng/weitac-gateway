@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.db import models
 # from redisco import models
 from json_field.fields import JSONField
+from django.utils import timezone
 
 
 # Create your models here.
@@ -19,8 +20,8 @@ class Service(models.Model):
     service_name = models.CharField(max_length=512)
     instance_amount = models.IntegerField()
     image_name = models.CharField(max_length=512)
-    created_at = models.IntegerField(default=0)
-    updated_at = models.IntegerField(default=0)
+    created_at = models.CharField(max_length=512, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
     details = JSONField(default={}, blank=True)
     finished_at = models.IntegerField(default=0)
 
@@ -32,12 +33,16 @@ class Instance(models.Model):
     continer_id = models.CharField(max_length=512, null=True)
     continer_ip = models.CharField(max_length=512, null=True)
     # image_name = models.CharField(max_length=512)
-    created_at = models.IntegerField(default=0)
-    updated_at = models.IntegerField(default=0)
+    created_at = models.CharField(max_length=512, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
     host = models.ForeignKey(Agent, null=True)
     details = JSONField(default={}, blank=True)
+    command = models.CharField(max_length=512, null=True)
+    hostname = models.CharField(max_length=512, null=True)
+    volumes = models.CharField(max_length=512, null=True)
+    environment = models.CharField(max_length=512, null=True)
 
-#     app_id = models.CharField(db_index=True, max_length=512)
+# app_id = models.CharField(db_index=True, max_length=512)
 #     finished_at = models.IntegerField(default=0)
 #     survived_day = models.DateField(default=datetime.date.today)
 #     size = models.CharField(max_length=256, default='None')
@@ -45,8 +50,8 @@ class Instance(models.Model):
 #     category = models.CharField(default='service', max_length=7)
 # #     details = models.CharField(max_length=512, null=True)
 
-    # def is_finished(self):
-    #     return self.finished_at != 0
-    #
-    # class Meta:
-    #     unique_together = ('instance_id', 'survived_day')
+# def is_finished(self):
+#     return self.finished_at != 0
+#
+# class Meta:
+#     unique_together = ('instance_id', 'survived_day')

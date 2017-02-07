@@ -155,7 +155,7 @@ def job_periodictask(request):
 @task()
 def add_celery_job(script, script_name, ip_addr):
     headers = {'Accept': 'application/json'}
-    r = requests.post('http://{0}:8000/{1}'.format(ip_addr, script_name), data=script, headers=headers)
+    r = requests.post('http://{0}:8000/job/{1}'.format(ip_addr, script_name), data=script, headers=headers)
     print 'success'
     print r
 

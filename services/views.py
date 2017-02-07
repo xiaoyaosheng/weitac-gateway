@@ -175,9 +175,16 @@ def update_service(request):
             if change > 0:
                 logger.info('Start increase instances')
                 for i in range(old_amount, new_instance_amount):
-
-                    bl, result = Instance_client().create_instance(service_name, i + 1)
-
+                    instance_obj = Instance.objects.get(service=service_obj[0])
+                    print instance_obj
+                    image_name = service_obj[0].image_name
+                    environment = instance_obj.environment
+                    hostname = instance_obj.hostname
+                    command = instance_obj.command
+                    volumes = instance_obj.volumes
+                    bl, result = Instance_client(). \
+                        create_instance(service_name, i + 1, image_name, environment,
+                                        hostname, command, volumes)
                     bl.service = service_obj[0]
                     bl.save()
                     if not bl:
@@ -199,7 +206,8 @@ def update_service(request):
                     return render_to_response('update_service.html')
 
         service_obj[0].instance_amount = new_instance_amount
-        service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
+        # service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
+        service_obj[0].updated_at = (timezone.now())
         service_obj[0].save()
         return render_to_response('update_service.html')
     else:
@@ -243,15 +251,15 @@ def instance_manage(request):
     # print request
     service_name = request.GET.get('service_name')
     ips = request.POST
-    for instance_name in ips :
+    for instance_name in ips:
 
-        ip=ips[instance_name]
+        ip = ips[instance_name]
         try:
-            change_ip(instance_name,ip)
+            change_ip(instance_name, ip)
         except Exception as e:
             logger.error(e)
-    service=Service.objects.get(service_name=service_name)
-    instances=Instance.objects.filter(service=service)
+    service = Service.objects.get(service_name=service_name)
+    instances = Instance.objects.filter(service=service)
     # print instances[0].name
 
     return render_to_response(
@@ -259,15 +267,16 @@ def instance_manage(request):
             'username': request.user.username, 'show_list': instances})
 
 
-def change_ip(instance_name,ip):
+def change_ip(instance_name, ip):
     try:
-        call_agent_change_ip(instance_name,ip)
+        call_agent_change_ip(instance_name, ip)
     except Exception as e:
         logger.error(e)
         return False
-    print instance_name,ip
-    service_DBclient.change_db_ip(instance_name,ip)
+    print instance_name, ip
+    service_DBclient.change_db_ip(instance_name, ip)
     return True
+
 
 class ServiceViewSet(viewsets.ModelViewSet):
     model = Service
@@ -520,10 +529,16 @@ class Instance_client(object):
             return None, ex
         # service = Service.objects.get(service_name=service_name)
         container_id = r.get('Id')
-        created_at = datetime_to_timestamp(timezone.now())
+        # created_at = datetime_to_timestamp(timezone.now())
+        created_at = (timezone.now())
         b = Instance(name=instance_name, created_at=created_at,
                      instance_id=instance_id,
-                     continer_id=container_id, )
+                     continer_id=container_id,
+                     command=command,
+                     hostname=hostname,
+                     volumes=volumes,
+                     environment=environment
+                     )
         # service = service,
         # host='hostname'
         # b.save()

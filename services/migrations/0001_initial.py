@@ -12,28 +12,28 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Instance',
+            name='Agent',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=512)),
-                ('service_name', models.CharField(max_length=512)),
-                ('continer_ip', models.CharField(max_length=20, null=True)),
-                ('instance_id', models.IntegerField()),
-                ('created_at', models.IntegerField(default=0)),
-                ('updated_at', models.IntegerField(default=0)),
-                ('host_name', models.CharField(max_length=512)),
-                ('details', json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', blank=True)),
+                ('host_name', models.CharField(max_length=20)),
+                ('host_ip', models.CharField(max_length=20)),
             ],
             options={
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='IpInfo',
+            name='Instance',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=20)),
-                ('is_used', models.BooleanField(default=False)),
+                ('name', models.CharField(max_length=512)),
+                ('instance_id', models.CharField(max_length=20, null=True)),
+                ('continer_id', models.CharField(max_length=512, null=True)),
+                ('continer_ip', models.CharField(max_length=512, null=True)),
+                ('created_at', models.CharField(max_length=512, null=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('details', json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', blank=True)),
+                ('host', models.ForeignKey(to='services.Agent', null=True)),
             ],
             options={
             },
@@ -46,13 +46,19 @@ class Migration(migrations.Migration):
                 ('service_name', models.CharField(max_length=512)),
                 ('instance_amount', models.IntegerField()),
                 ('image_name', models.CharField(max_length=512)),
-                ('created_at', models.IntegerField(default=0)),
-                ('updated_at', models.IntegerField(default=0)),
+                ('created_at', models.CharField(max_length=512, null=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('details', json_field.fields.JSONField(default={}, help_text='Enter a valid JSON object', blank=True)),
                 ('finished_at', models.IntegerField(default=0)),
             ],
             options={
             },
             bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='instance',
+            name='service',
+            field=models.ForeignKey(to='services.Service', null=True),
+            preserve_default=True,
         ),
     ]
