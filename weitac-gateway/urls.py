@@ -29,6 +29,15 @@ urlpatterns = patterns('',
                        url(r'^job_upload/$', 'jobs.views.job_upload'),
                        url(r'^job_run/$', 'jobs.views.job_run'),
                        url(r'^job_periodictask/$', 'jobs.views.job_periodictask'),
+
+                       url(r'^configuration_manage/$', 'configurations.view.configuration_manage'),
+                       # url(r'^search_service/$','services.views.search_service'),
+                       # url(r'^search_job/$','jobs.views.search_job'),
+
+
+
+
+
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),
                        # url(r'^create_service/$',

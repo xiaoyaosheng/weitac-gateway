@@ -21,11 +21,13 @@
                                     <td>{{ service.name }}</td>
 {#                                    <td>{{ service.details }}</td>#}
                                     <td>{{ service.continer_id }}</td>
-                                    {% if service.continer_ip %}
+                                    {% if service.address %}
 
-                                        <td>{{ service.continer_ip }}</td>
+                                        <td>{{ service.address }}</td>
                                     {% else %}
-                                        <td><input type="text" class="input" name={{ service.name }}></td>
+                                        <td><input type="text" class="input" name={{ service.name }}+ip></td>
+                                        <td><input type="text" class="input" name={{ service.name }}+subnet_mask></td>
+                                        <td><input type="text" class="input" name={{ service.name }}+gateway_ip></td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}

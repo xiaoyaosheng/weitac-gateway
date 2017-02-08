@@ -8,7 +8,7 @@ get the healthy info of instance of marathon and user's order of stop/delete app
 
 	sudo apt-get update
 	sudo apt-get install -y git python-pip python-dev build-essential python-psycopg2
-	git clone https://username@bitbucket.org/mathildetech/weitac-gateway.git
+	git clone http://weitac-gateway.git
 	cd weitac-gateway
 	sudo pip install -r requirements.txt
 	sudo mkdir /var/log/mathilde/
@@ -26,12 +26,8 @@ sudo python manage.py migrate
 	cd /home/ubuntu/weitac-gateway/test
 	python event_tests.py
 
-### add cron:
-
-	@reboot /usr/bin/python /home/ubuntu/weitac-gateway/manage.py runserver 0.0.0.0:8080
 
 ### subscribe eventbus from marathon
 
-	curl -X POST -H "Content-Type:application/json" -d '{}' https://marathon.alauda.club:8443/v2/eventSubscriptions?callbackUrl=https://weitac-gateway.alauda.club:8443/v1/instance/events/
 	
 	docker run -d -p 8080:8080 --name weitac-gatway weitac-gatway

@@ -6,9 +6,11 @@ from django.utils import timezone
 
 
 # Create your models here.
-# class IpInfo(models.Model):
-#     name = models.CharField(max_length=20)
-#     is_used = models.BooleanField(default=False)
+class IpInfo(models.Model):
+    address = models.CharField(max_length=20)
+    is_used = models.BooleanField(default=False)
+    gateway_ip = models.CharField(max_length=20)
+    subnet_mask = models.CharField(max_length=20,default=24)
 
 
 class Agent(models.Model):
@@ -31,7 +33,7 @@ class Instance(models.Model):
     service = models.ForeignKey(Service, null=True)
     instance_id = models.CharField(max_length=20, null=True)
     continer_id = models.CharField(max_length=512, null=True)
-    continer_ip = models.CharField(max_length=512, null=True)
+    continer_ip = models.ForeignKey(IpInfo, null=True)
     # image_name = models.CharField(max_length=512)
     created_at = models.CharField(max_length=512, null=True)
     updated_at = models.DateTimeField(auto_now=True)

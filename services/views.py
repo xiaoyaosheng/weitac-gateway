@@ -203,15 +203,18 @@ def update_service(request):
                     Instance.objects.get(name=instance_name).delete()
                 if new_instance_amount == 0:
                     service_obj.delete()
-                    return render_to_response('update_service.html')
+                    return render_to_response('update_service.html', {
+                        'username': request.user.username})
 
         service_obj[0].instance_amount = new_instance_amount
         # service_obj[0].updated_at = datetime_to_timestamp(timezone.now())
         service_obj[0].updated_at = (timezone.now())
         service_obj[0].save()
-        return render_to_response('update_service.html')
+        return render_to_response('update_service.html', {
+            'username': request.user.username})
     else:
-        return render_to_response('update_service.html')
+        return render_to_response('update_service.html', {
+            'username': request.user.username})
 
 
 def delete_services(request):
@@ -248,33 +251,47 @@ def delete_services(request):
 
 
 def instance_manage(request):
-    # print request
     service_name = request.GET.get('service_name')
-    ips = request.POST
-    for instance_name in ips:
+    if request.method=='POST':
+        ips = request.POST
+        info_dic = {}
+        for info in ips:
+            info_type = info.split('+')[-1]
+            instance_name = info[:-len(info_type) - 1]
+            if instance_name not in info_dic:
+                info_dic[instance_name] = {}
 
-        ip = ips[instance_name]
-        try:
-            change_ip(instance_name, ip)
-        except Exception as e:
-            logger.error(e)
+            info_dic[instance_name][info_type] = ips[info]
+        for instance_name in info_dic:
+            instance_ip_info = info_dic[instance_name]
+            ip = instance_ip_info.get('ip')
+            subnet_mask = instance_ip_info.get('subnet_mask')
+            gateway_ip = instance_ip_info.get('gateway_ip')
+
+            try:
+                change_ip(instance_name, ip, subnet_mask, gateway_ip)
+            except Exception as e:
+                logger.error(e)
+
     service = Service.objects.get(service_name=service_name)
     instances = Instance.objects.filter(service=service)
-    # print instances[0].name
-
+    for instance in instances:
+        if not instance.continer_ip:
+            continue
+        instance.address=instance.continer_ip.address
     return render_to_response(
         'instance_manage.html', {
             'username': request.user.username, 'show_list': instances})
 
 
-def change_ip(instance_name, ip):
+def change_ip(instance_name, ip, subnet_mask, gateway_ip):
     try:
-        call_agent_change_ip(instance_name, ip)
+        (instance_name, ip, subnet_mask, gateway_ip)
     except Exception as e:
         logger.error(e)
         return False
-    print instance_name, ip
-    service_DBclient.change_db_ip(instance_name, ip)
+    # print instance_name, ip
+    service_DBclient.change_db_ip(instance_name, ip, subnet_mask, gateway_ip)
     return True
 
 

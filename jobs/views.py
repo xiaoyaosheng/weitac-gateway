@@ -162,7 +162,7 @@ def add_celery_job(script, script_name, ip_addr):
     # return r.text
 
 
-def call_agent_change_ip(instance_name, ip):
+def call_agent_change_ip(instance_name, ip,subnet_mask, gateway_ip):
     # headers = {'Accept': 'application/json'}
     # r = requests.post('http://{0}:8000/{1}'.format(ip_addr, script_name), data=script, headers=headers)
     pass
