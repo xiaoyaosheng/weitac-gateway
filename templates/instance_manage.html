@@ -12,6 +12,8 @@
                     <th>实例名</th>
                     <th>容器id</th>
                     <th>ip</th>
+                    <th>子网掩码</th>
+                    <th>网关ip</th>
                     <tr>{{ search_error }}</tr>
                     <form class="form-horizontal" role="form" method="post">
                         <!--show ip list-->
@@ -19,11 +21,13 @@
                             {% for service in show_list %}
                                 <tr>
                                     <td>{{ service.name }}</td>
-{#                                    <td>{{ service.details }}</td>#}
+                                    {#                                    <td>{{ service.details }}</td>#}
                                     <td>{{ service.continer_id }}</td>
-                                    {% if service.address %}
+                                    {% if service.continer_ip %}
 
-                                        <td>{{ service.address }}</td>
+                                        <td>{{ service.continer_ip.address }}</td>
+                                        <td>{{ service.continer_ip.subnet_mask }}</td>
+                                        <td>{{ service.continer_ip.gateway_ip }}</td>
                                     {% else %}
                                         <td><input type="text" class="input" name={{ service.name }}+ip></td>
                                         <td><input type="text" class="input" name={{ service.name }}+subnet_mask></td>

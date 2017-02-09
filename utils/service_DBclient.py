@@ -1,7 +1,7 @@
 import time
 from django.utils import timezone
 from services.models import Instance
-from services.models import IpInfo
+from services.models import IpInfo,Agent
 import datetime
 
 
@@ -34,3 +34,7 @@ def change_db_ip(instance_name, ip, subnet_mask, gateway_ip):
     print instance
     instance.continer_ip = ipinfo[0]
     instance.save()
+
+
+def create_agent_info(node_name,node_ip):
+    return Agent.objects.get_or_create(host_ip=node_ip,host_name=node_name)[0]

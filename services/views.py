@@ -252,7 +252,7 @@ def delete_services(request):
 
 def instance_manage(request):
     service_name = request.GET.get('service_name')
-    if request.method=='POST':
+    if request.method == 'POST':
         ips = request.POST
         info_dic = {}
         for info in ips:
@@ -275,10 +275,10 @@ def instance_manage(request):
 
     service = Service.objects.get(service_name=service_name)
     instances = Instance.objects.filter(service=service)
-    for instance in instances:
-        if not instance.continer_ip:
-            continue
-        instance.address=instance.continer_ip.address
+    # for instance in instances:
+    #     if not instance.continer_ip:
+    #         continue
+    # instance.ip=instance.continer_ip.address
     return render_to_response(
         'instance_manage.html', {
             'username': request.user.username, 'show_list': instances})
@@ -286,7 +286,7 @@ def instance_manage(request):
 
 def change_ip(instance_name, ip, subnet_mask, gateway_ip):
     try:
-        (instance_name, ip, subnet_mask, gateway_ip)
+        call_agent_change_ip(instance_name, ip, subnet_mask, gateway_ip)
     except Exception as e:
         logger.error(e)
         return False
@@ -548,13 +548,26 @@ class Instance_client(object):
         container_id = r.get('Id')
         # created_at = datetime_to_timestamp(timezone.now())
         created_at = (timezone.now())
+        try:
+            """
+            create agent info in db.
+            """
+            a = swarm_client.inspect_container(container_id)
+
+            node_name = a.get('Node').get('Name')
+            node_ip = a.get('Node').get('IP')
+            agent_obj = service_DBclient.create_agent_info(node_name, node_ip)
+        except Exception as ex:
+            agent_obj = None
+            logger.debug('Did not get agent info:{}'.format(ex))
         b = Instance(name=instance_name, created_at=created_at,
                      instance_id=instance_id,
                      continer_id=container_id,
                      command=command,
                      hostname=hostname,
                      volumes=volumes,
-                     environment=environment
+                     environment=environment,
+                     host=agent_obj
                      )
         # service = service,
         # host='hostname'
