@@ -268,10 +268,11 @@ def instance_manage(request):
             subnet_mask = instance_ip_info.get('subnet_mask')
             gateway_ip = instance_ip_info.get('gateway_ip')
 
-            try:
-                change_ip(instance_name, ip, subnet_mask, gateway_ip)
-            except Exception as e:
-                logger.error(e)
+            # try:
+            service_DBclient.change_db_ip(instance_name, ip, subnet_mask, gateway_ip)
+            assignment_ip(instance_name)
+            # except Exception as e:
+            #     logger.error(e)
 
     service = Service.objects.get(service_name=service_name)
     instances = Instance.objects.filter(service=service)
@@ -284,15 +285,30 @@ def instance_manage(request):
             'username': request.user.username, 'show_list': instances})
 
 
-def change_ip(instance_name, ip, subnet_mask, gateway_ip):
+# def change_ip(instance_name, ip, subnet_mask, gateway_ip):
+#     try:
+#         call_agent_change_ip(agent_ip, instance_name, intance_ip, subnet_mask, gateway_ip)
+#     except Exception as e:
+#         logger.error(e)
+#         return False
+#     # print instance_name, ip
+#     service_DBclient.change_db_ip(instance_name, ip, subnet_mask, gateway_ip)
+#     return True
+
+
+def assignment_ip(instance_name):
     try:
-        call_agent_change_ip(instance_name, ip, subnet_mask, gateway_ip)
-    except Exception as e:
-        logger.error(e)
-        return False
-    # print instance_name, ip
-    service_DBclient.change_db_ip(instance_name, ip, subnet_mask, gateway_ip)
-    return True
+        instance_obj = Instance.objects.get(name=instance_name)
+    except Exception as ex:
+        logger.error('Did not have this instance {}:{}'.format(instance_name, ex))
+        return
+    if not instance_obj.continer_ip:
+        return
+    agent_ip = instance_obj.host.host_ip
+    intance_ip = instance_obj.continer_ip.address
+    subnet_mask = instance_obj.continer_ip.subnet_mask
+    gateway_ip = instance_obj.continer_ip.gateway_ip
+    call_agent_change_ip(agent_ip, instance_name, intance_ip, subnet_mask, gateway_ip)
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
