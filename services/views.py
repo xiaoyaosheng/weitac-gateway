@@ -7,6 +7,7 @@ from models import Service, Instance, Agent
 import logging
 import requests
 import docker
+# from docker import utils as docker_utils
 import time
 from django.utils import timezone
 from services.serializers import ServiceSerializer
@@ -201,7 +202,9 @@ def update_service(request):
                 for i in range(new_instance_amount, old_amount):
                     logger.debug('{} start!'.format(i))
                     instance_name = service_name + '_{}'.format(i + 1)
-                    Instance_client().delete_instance(instance_name)
+                    ifSuccess = Instance_client().delete_instance(instance_name)
+                    if not ifSuccess:
+                        continue
                     Instance.objects.get(name=instance_name).delete()
                 if new_instance_amount == 0:
                     service_obj.delete()
@@ -310,7 +313,8 @@ def assignment_ip(instance_name):
     intance_ip = instance_obj.continer_ip.address
     subnet_mask = instance_obj.continer_ip.subnet_mask
     gateway_ip = instance_obj.continer_ip.gateway_ip
-    call_agent_change_ip(agent_ip, instance_name, intance_ip, subnet_mask, gateway_ip)
+    call_agent_change_ip.delay(agent_ip, instance_name, intance_ip, subnet_mask, gateway_ip)
+
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -609,7 +613,10 @@ class Instance_client(object):
         try:
             swarm_client.stop(container=continer_id)
             swarm_client.remove_container(container=continer_id)
-        except Exception as ex:
+        except requests.exceptions.HTTPError as ex:
+            logger.error("Error: {}".format(ex))
+            return True
+        except requests.exceptions.ConnectionError as ex:
             logger.error("Error: {}".format(ex))
             return False
         return True
