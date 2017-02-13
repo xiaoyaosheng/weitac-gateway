@@ -185,6 +185,8 @@ def update_service(request):
                     bl, result = Instance_client(). \
                         create_instance(service_name, i + 1, image_name, environment,
                                         hostname, command, volumes)
+                    if not bl:
+                        return render_to_response('500.html')
                     bl.service = service_obj[0]
                     bl.save()
                     if not bl:
@@ -609,6 +611,7 @@ class Instance_client(object):
             swarm_client.remove_container(container=continer_id)
         except Exception as ex:
             logger.error("Error: {}".format(ex))
+            return False
         return True
 
     def add_host_info(self, db_info):
