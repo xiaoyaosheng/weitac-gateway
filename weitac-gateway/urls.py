@@ -34,7 +34,7 @@ urlpatterns = patterns('',
                        # url(r'^search_service/$','services.views.search_service'),
                        # url(r'^search_job/$','jobs.views.search_job'),
 
-                       url(r'^assignment_ip/$', 'services.views.assignment_ip')
+                       url(r'^call_back/$', 'services.views.call_back')
 
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),
