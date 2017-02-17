@@ -31,7 +31,8 @@ INSTALLED_APPS = (
     # 'rest_framework.authtoken',
     'services',
     'login',
-    'jobs'
+    'jobs',
+    'configurations'
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row-fluid">
+
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="active">
+                        <a href="/configuration_manage/" methods="get" style="margin:0cm;">配置列表</a>
+                    </li>
+                    <li>
+                        <a href="/configuration_upload/" methods="get" style="margin:0cm;">上传配置</a>
+                    </li>
+                    <li>
+                        <a href="/configuration_run/" style="margin:0cm;">修改配置</a>
+                    </li>
+{#                    <li>#}
+{#                        <a href="/job_periodictask/" style="margin:0cm;">定时添加任务</a>#}
+{#                    </li>#}
+                    {#        <li>#}
+                    {#          <a href="/update_services/">删除服务</a>#}
+                    {#        </li>#}
+                </ul>
+            </div>
+        </div>
+
+        <div class="span9 well">
+            {% block showpage %}
+                <form class="form-horizontal" role="form" method="get" action="/search_job/">
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="text" class="input" name="search">
+                            <button type="submit" class="btn">查询</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table">
+                    <th></th>
+                    <th>配置名</th>
+                    <th>更新时间</th>
+                    <th>配置功能</th>
+                    {#        <tr>{{search_error}}</tr>#}
+                    <form class="form-horizontal" role="form" method="post">
+                        <!--show ip list-->
+                        {% if show_list %}
+                            {% for configuration in show_list %}
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox" name="post_jobs"
+                                               value="{{ configuration.job_name }}"></td>
+                                    <td>{{ configuration.configuration_name }}</td>
+                                    <td>{{ configuration.updated_at }}</td>
+                                    <td>{{ configuration.describe }}</td>
+                                </tr>
+                            {% endfor %}
+                                        <button type="submit" class="btn">删除</button>
+                        {% endif %}
+
+                    </form>
+                </table>
+
+
+                {% if paginator.page_range %}
+                    <ul class="pagination">
+                        {% if show_list.has_previous %}
+                            <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            <li><a href="?page={{ i }}&search={{ s_text }}" name="page">{{ i }}</a></li>
+                        {% endfor %}
+                        {% if show_list.has_next %}
+                            <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+            {% endblock %}
+        </div>
+
+    </div>
+{% endblock %}

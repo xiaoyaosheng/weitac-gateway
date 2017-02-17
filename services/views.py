@@ -307,7 +307,7 @@ def call_back(request):
     # if request.method == 'POST':
     #     ips = request.POST
     #     info_dic = {}
-    return HttpResponse("success",status=status.HTTP_200_OK)
+    return HttpResponse("success", status=status.HTTP_200_OK)
 
 
 def assignment_ip(instance_name):
@@ -323,7 +323,6 @@ def assignment_ip(instance_name):
     subnet_mask = instance_obj.continer_ip.subnet_mask
     gateway_ip = instance_obj.continer_ip.gateway_ip
     call_agent_change_ip.delay(agent_ip, instance_name, intance_ip, subnet_mask, gateway_ip)
-
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
@@ -563,13 +562,14 @@ class Instance_client(object):
         #     "com.example.version": "1.0"}
         # HostConfig = {"NetworkMode": "bridge"}
         try:
-
+            print image_name, command, instance_name, hostname, volumes
             r = swarm_client.create_container(image=image_name,
                                               command=command,
                                               name=instance_name,
                                               # environment=environment,
                                               hostname=hostname,
-                                              volumes=volumes
+                                              volumes=volumes,
+
                                               )
 
         except Exception as ex:

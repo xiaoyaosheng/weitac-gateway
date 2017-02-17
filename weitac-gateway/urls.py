@@ -4,6 +4,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from services.views import ServiceViewSet
 import services
+from configurations.views import ConfigurationViewSet
 
 urlpatterns = patterns('',
                        # Examples:
@@ -30,7 +31,15 @@ urlpatterns = patterns('',
                        url(r'^job_run/$', 'jobs.views.job_run'),
                        url(r'^job_periodictask/$', 'jobs.views.job_periodictask'),
 
-                       url(r'^configuration_manage/$', 'configurations.view.configuration_manage'),
+                       url(r'^configuration_manage/$', 'configurations.views.configuration_manage'),
+                       url(r'^configuration_upload/$', 'configurations.views.configuration_upload'),
+                       url(r'^configuration_update/$', 'configurations.views.configuration_update'),
+                       # url(r'^configuration/$', 'configurations.views.configuration_update'),
+                       url(r'^configuration/?',
+                           ConfigurationViewSet.as_view({'get': 'get_configuration',
+                                                         'post': 'upload_configuration',
+                                                         'put': 'update_configuration',
+                                                         'delete': 'delete_configuration'})),
                        # url(r'^search_service/$','services.views.search_service'),
                        # url(r'^search_job/$','jobs.views.search_job'),
 

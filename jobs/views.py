@@ -174,3 +174,24 @@ def call_agent_change_ip(agent_ip, instance_name, assignment_ip, subnet_mask, ga
     data = json.JSONEncoder().encode(script)
     r = requests.post('http://{0}:8000/assignment_ip'.format(agent_ip), data=data, headers=headers)
     print r
+
+
+def call_agent_cp_configuration(agent_host_ip,instance_name,configuration_name,data,dir):
+    headers = {'Accept': 'application/json'}
+    # time.sleep(5)
+    # print agent_host_ip
+
+    script = {"instance_name": instance_name,
+              "configuration_name":configuration_name,
+              "data": data,
+              "dir": dir}
+    # data= json.dump(script)
+    script = json.JSONEncoder().encode(script)
+    # files = {'file': ('report.csv', 'some,data,to,send\nanother,row,to,send\n')}
+    # print type(data)
+    # files = {'file': data}
+    # try:
+    r = requests.post('http://{0}:8000/docker_cp'.format(agent_host_ip), data=script,headers=headers)
+    print r.text
+    # except:
+    #     pass

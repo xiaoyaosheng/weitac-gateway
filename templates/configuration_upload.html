@@ -1,0 +1,32 @@
+{% extends 'configuration_manage.html' %}
+{% block showpage %}
+
+
+<form enctype="multipart/form-data" method="post" action="/configuration_upload/">
+    <div>
+
+        <label class="control-label">选择配置</label>
+        <input type="file" name="script" class="file" data-show-preview="false"/>
+        <label class="control-label">配置描述</label>
+        <input type="text" class="input-block-level" name="describe"
+                       placeholder="describe">
+        <label class="control-label">如果需要另命名,默认上传名</label>
+        <input type="text" class="input-block-level" name="name"
+                       placeholder="name">
+    </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <p>{{ add_error }}</p>
+      <button type="submit" class="btn">提交</button>
+      <a class="btn" href="/configuration_manage/">取消</a>
+    </div>
+  </div>
+</form>
+
+
+
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+<script src="/static/js/fileinput.min.js"></script>
+
+{% endblock %}
