@@ -176,13 +176,13 @@ def call_agent_change_ip(agent_ip, instance_name, assignment_ip, subnet_mask, ga
     print r
 
 
-def call_agent_cp_configuration(agent_host_ip,instance_name,configuration_name,data,dir):
+def call_agent_cp_configuration(agent_host_ip, instance_name, configuration_name, data, dir):
     headers = {'Accept': 'application/json'}
     # time.sleep(5)
     # print agent_host_ip
 
     script = {"instance_name": instance_name,
-              "configuration_name":configuration_name,
+              "configuration_name": configuration_name,
               "data": data,
               "dir": dir}
     # data= json.dump(script)
@@ -191,7 +191,7 @@ def call_agent_cp_configuration(agent_host_ip,instance_name,configuration_name,d
     # print type(data)
     # files = {'file': data}
     # try:
-    r = requests.post('http://{0}:8000/docker_cp'.format(agent_host_ip), data=script,headers=headers)
+    r = requests.post('http://{0}:8000/docker_cp'.format(agent_host_ip), data=script, headers=headers)
     print r.text
     # except:
     #     pass

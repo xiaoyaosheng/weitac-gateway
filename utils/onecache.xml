@@ -1,0 +1,16 @@
+<onecache port="6379" thread_num="64" hash_value_max="80" daemonize="1" guard="1" hash="fnv1a_64" twemproxy_mode="0"
+          backendReconnInterval="5" log_file="/OneCache/onecache.log" pid_file="/OneCache/onecache.pid">
+    <vip if_alias_name="eth1:0" vip_address="10.6.168.230" enable="0"></vip>
+    <top_key enable="0"></top_key>
+    <group_option backend_retry_interval="3" backend_retry_limit="100" auto_eject_group="0" group_retry_time="5"
+                  eject_after_restore="0">
+    </group_option>
+    <group name="group1" hash_min="0" hash_max="79" policy="read_balance">
+        <host host_name="redism" ip="172.20.2.141" port="6379" master="1" connect_num="100"></host>
+        <host host_name="rediss" ip="172.20.2.142" port="6379" master="0" connect_num="100"></host>
+        <host host_name="rediss2" ip="172.20.2.143" port="6379" master="0" connect_num="100"></host>
+        <host host_name="rediss3" ip="172.20.2.144" port="6379" master="0" connect_num="100"></host>
+    </group>
+
+</onecache>
+

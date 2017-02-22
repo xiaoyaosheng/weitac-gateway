@@ -8,8 +8,10 @@ from rest_framework import viewsets
 from models import Configuration
 from services.models import Agent
 import logging
+
 import ConfigParser
 import StringIO
+from utils.XML_client import del_xml_configuration
 import requests
 import docker
 # from docker import utils as docker_utils
@@ -212,22 +214,37 @@ class ConfigurationViewSet(viewsets.ModelViewSet):
             data = request.DATA
             instance_name = data.get('instance_name')
             configuration_name = data.get('configuration_name')
-            sections = data.get('parameters')
+
+            configuration_dir = data.get('configuration_dir')
 
             obj = Configuration.objects.get(configuration_name=configuration_name)
-            config = ConfigParser.RawConfigParser(allow_no_value=True)
-            s = StringIO.StringIO()
+            file_obj = StringIO.StringIO()
+            file_obj.write(obj.info)
+            file_obj.seek(0)
             changed_file = StringIO.StringIO()
-            s.write(obj.info)
-            s.seek(0)
-            config.readfp(s)
+            configuration_type = configuration_name.split('.')[-1]
+            if configuration_type == 'xml':
 
-            for section, value_dic in sections.items():
-                # print section
-                for parameter, parameter_value in value_dic.items():
-                    # print parameter, parameter_value
+                change = data.get('change')
+                new = data.get('new')
 
-                    config.set(section, parameter, parameter_value)
+                config=del_xml_configuration(file_obj,change,new)
+
+            elif configuration_type=='cnf':
+                sections = data.get('parameters')
+                config = ConfigParser.RawConfigParser(allow_no_value=True)
+                s = StringIO.StringIO()
+
+                s.write(obj.info)
+                s.seek(0)
+                config.readfp(s)
+
+                for section, value_dic in sections.items():
+                    # print section
+                    for parameter, parameter_value in value_dic.items():
+                        # print parameter, parameter_value
+
+                        config.set(section, parameter, parameter_value)
 
             config.write(changed_file)
             changed_file.seek(0)
@@ -242,17 +259,39 @@ class ConfigurationViewSet(viewsets.ModelViewSet):
             agent_host_ip = agent_obj.host_ip
 
             data = changed_file.read()
-            dir = '/'
-            call_agent_cp_configuration(agent_host_ip, instance_name, configuration_name,data, dir)
+            dir = configuration_dir
+            try:
+                call_agent_cp_configuration(agent_host_ip, instance_name, configuration_name, data, dir)
+            except Exception as ex:
+                return Response(str(ex),
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            # r = requests.post('http://10.6.168.161:8000/cp', data=script, headers=headers)
-
-            # return render_to_response('configuration_manage.html')
         return Response("success",
                         status=status.HTTP_200_OK)
 
     def upload_configuration(self, request):
-        pass
+        if request.GET.get('source') == 'master':
+            data = request.DATA
+            myFile = request.FILES.get('script', None)
+
+            name = data.get('name')
+            describe = data.get('describe')
+
+            if name:
+                save_name = name
+            else:
+                save_name = myFile.name
+            # print(myFile._size)  # 文件大小字节数
+            if Configuration.objects.filter(configuration_name=save_name).exists():
+                return Response('脚本已经存在', status=status.HTTP_400_BAD_REQUEST)
+            data = myFile.read()
+            job_obj = Configuration()
+
+            job_obj.configuration_name = save_name
+            job_obj.info = data
+            job_obj.describe = describe
+            job_obj.save()
+            return Response("success", status=status.HTTP_200_OK)
 
     def delete_configuration(self, reqest):
         pass

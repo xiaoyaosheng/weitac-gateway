@@ -26,6 +26,13 @@ urlpatterns = patterns('',
                        url(r'^create_service/$', 'services.views.create_service'),
 
                        url(r'^update_service/$', 'services.views.update_service'),
+                       url(r'^services/?',
+                           ServiceViewSet.as_view({'post': 'create_service',
+                                                   'put': 'update_services',
+                                                   'delete': 'delete_services',
+                                                   'get': 'get_services',
+                                                   })),
+
                        url(r'^job_manage/$', 'jobs.views.job_manage'),
                        url(r'^job_upload/$', 'jobs.views.job_upload'),
                        url(r'^job_run/$', 'jobs.views.job_run'),
@@ -43,7 +50,7 @@ urlpatterns = patterns('',
                        # url(r'^search_service/$','services.views.search_service'),
                        # url(r'^search_job/$','jobs.views.search_job'),
 
-                       url(r'^call_back/$', 'services.views.call_back')
+                       url(r'^call_back/$', 'services.views.call_back'),
 
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),
@@ -67,12 +74,7 @@ urlpatterns = patterns('',
                        # url(r'^search_ip/$', 'devmanage.views.search_ip'),
                        #
                        #
-                       # url(r'^services/?',
-                       #     ServiceViewSet.as_view({'post': 'create_service',
-                       #                             'put': 'update_services',
-                       #                             'delete': 'delete_services',
-                       #                             'get': 'get_services',
-                       #                             })),
+
                        #
                        # url(r'^continer/?',
                        #     ServiceViewSet.as_view({'post': 'create_continer'
