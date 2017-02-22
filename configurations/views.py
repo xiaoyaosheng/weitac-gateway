@@ -11,7 +11,8 @@ import logging
 
 import ConfigParser
 import StringIO
-from utils.XML_client import del_xml_configuration
+from utils.configuration_client import del_xml_configuration,del_conf_configuration
+
 import requests
 import docker
 # from docker import utils as docker_utils
@@ -229,7 +230,9 @@ class ConfigurationViewSet(viewsets.ModelViewSet):
                 new = data.get('new')
 
                 config=del_xml_configuration(file_obj,change,new)
-
+                config.write(changed_file)
+                changed_file.seek(0)
+                data = changed_file.read()
             elif configuration_type=='cnf':
                 sections = data.get('parameters')
                 config = ConfigParser.RawConfigParser(allow_no_value=True)
@@ -240,26 +243,29 @@ class ConfigurationViewSet(viewsets.ModelViewSet):
                 config.readfp(s)
 
                 for section, value_dic in sections.items():
-                    # print section
+
                     for parameter, parameter_value in value_dic.items():
-                        # print parameter, parameter_value
 
                         config.set(section, parameter, parameter_value)
+                config.write(changed_file)
+                changed_file.seek(0)
+                data = changed_file.read()
+            elif configuration_type == 'conf':
+                change = data.get('change')
+                delete = data.get('delete')
+                data = del_conf_configuration(file_obj, change, delete)
 
-            config.write(changed_file)
-            changed_file.seek(0)
-            # print changed_file.read()
+            else:
+                return Response('Configuration type not support',status=status.HTTP_400_BAD_REQUEST)
             try:
                 instance_obj = Instance.objects.get(name=instance_name)
             except Exception as ex:
                 print ex
                 return
             agent_obj = instance_obj.host
-            # continer_ip_obj = instance_obj.continer_ip
             agent_host_ip = agent_obj.host_ip
-
-            data = changed_file.read()
             dir = configuration_dir
+
             try:
                 call_agent_cp_configuration(agent_host_ip, instance_name, configuration_name, data, dir)
             except Exception as ex:

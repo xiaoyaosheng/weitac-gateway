@@ -4,7 +4,7 @@
 import unittest
 from xml.etree.ElementTree import ElementTree, Element
 import xml.etree.ElementTree as ET
-
+import StringIO
 
 def read_xml(in_path):
     '''''读取并解析xml文件
@@ -80,14 +80,14 @@ def change_node_text(nodelist, text, is_add=False, is_delete=False):
             node.text = text
 
 
-def create_node(tag, property_map, content):
+def create_node(tag, property_map):
     '''''新造一个节点
        tag:节点标签
        property_map:属性及属性值map
        content: 节点闭合标签里的文本内容
        return 新节点'''
     element = Element(tag, property_map)
-    element.text = content
+    # element.text = content
     return element
 
 
@@ -150,9 +150,8 @@ def circle_find_list(objs, root):
         for obj in objs:
             for k in obj:
                 v = obj[k]
-                new_e = create_node(k, v, "what")
+                new_e = create_node(k, v)
                 root.append(new_e)
-
 
 
 def circle_change(obj, s, result_lis):
@@ -184,6 +183,53 @@ def indent(elem, level=0):
     if level and (not elem.tail or not elem.tail.strip()):
         elem.tail = i
     return elem
+
+
+def del_conf_configuration(file_obj, change_dic, delete_lis):
+    """
+    def conf file
+    :param file_obj: file obj
+    :param change: dict
+    :param delete: dict
+    :return:
+    """
+    file_lines = file_obj.readlines()
+    new_file_lines = list()
+    for file_line in file_lines:
+        if file_line[0] == '#':
+            continue
+        elif len(file_line) == file_line.count('\n'):
+            continue
+        else:
+            # print file_line
+            new_file_lines.append(file_line)
+    """
+    change
+    """
+    result=list()
+    for k, values in change_dic.items():
+        for file_line in new_file_lines:
+            if file_line.split(" ")[0] == k:
+                blocks = file_line.split(' ')
+                new_blocks=[]
+                for i, value in enumerate(values):
+                    print value
+                    new_blocks.append(value)
+                new_str = k + ' '
+                for block in new_blocks:
+                    new_str = new_str + block + ' '
+                    # print new_str
+                result.append(new_str+'\n')
+            else:
+                result.append(file_line)
+    """
+    delete
+    """
+    for line in result:
+        if line.split(" ")[0] in delete_lis:
+            result.remove(line)
+    result_str = ''.join(result)
+    return result_str
 
 
 if __name__ == '__main__':
