@@ -302,13 +302,6 @@ def instance_manage(request):
 #     return True
 
 
-def call_back(request):
-    instance_name = request.GET.get('instance_name')
-    print request
-    # if request.method == 'POST':
-    #     ips = request.POST
-    #     info_dic = {}
-    return HttpResponse("success", status=status.HTTP_200_OK)
 
 
 def assignment_ip(instance_name):

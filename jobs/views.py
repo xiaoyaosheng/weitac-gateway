@@ -161,7 +161,6 @@ def add_celery_job(script, script_name, ip_addr):
 
     # return r.text
 
-
 @task()
 def call_agent_change_ip(agent_ip, instance_name, assignment_ip, subnet_mask, gateway_ip):
     headers = {'Accept': 'application/json'}

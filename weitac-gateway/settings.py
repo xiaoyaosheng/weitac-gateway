@@ -1,6 +1,7 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import djcelery
+from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -167,11 +168,14 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
+# CELERY_ALWAYS_EAGER = True
 CELERY_IMPORTS = ("jobs.tasks", "jobs.views")
-
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 # CELERYBEAT_SCHEDULE = {
-#    'add-every-3-minutes': {
-#        'task': 'mrs_app.my_celery.tasks.monthly_reading_task',
-#        'schedule': timedelta(minutes=3)
-#    },
+#     'add-every-30-seconds': {
+#         'task': 'tasks.add',
+#         'schedule': timedelta(seconds=1),
+#         'args': (16, 16)
+#     },
 # }

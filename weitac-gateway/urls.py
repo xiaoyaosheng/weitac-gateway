@@ -5,7 +5,7 @@ from django.contrib import admin
 from services.views import ServiceViewSet
 import services
 from configurations.views import ConfigurationViewSet
-
+# from events.views import
 urlpatterns = patterns('',
                        # Examples:
                        # url(r'^$', 'weitac-gateway.views.home', name='home'),
@@ -50,7 +50,7 @@ urlpatterns = patterns('',
                        # url(r'^search_service/$','services.views.search_service'),
                        # url(r'^search_job/$','jobs.views.search_job'),
 
-                       url(r'^call_back/$', 'services.views.call_back'),
+                       url(r'^event_handle/$', 'events.views.event_handle'),
 
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),
