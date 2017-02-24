@@ -11,5 +11,5 @@ python manage.py migrate
 nohup rabbitmq-server &
 nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
 nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
-nohup python manage.py celery beat
+#nohup python manage.py celery beat
 /usr/local/bin/supervisord --nodaemon
