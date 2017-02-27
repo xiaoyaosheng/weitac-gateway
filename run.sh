@@ -8,8 +8,7 @@
 #/usr/local/bin/supervisord --nodaemon # Run supervisord in the foreground
 python manage.py makemigrations
 python manage.py migrate
-nohup rabbitmq-server &
-nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
-nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
+#nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
+#nohup python manage.py celery worker --loglevel=info --config=celeryconfig &
 #nohup python manage.py celery beat
 /usr/local/bin/supervisord --nodaemon
