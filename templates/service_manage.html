@@ -1,81 +1,109 @@
 {% extends 'base.html' %}
+<script language="javascript">
+    function test() {
+        $.ajax({
+            type: "PUT",
+            url: "Page2.php",
+            data: "value=apple",
+            success: function (msg) {
+                alert("sucess put: " + msg);
+            }
+        });
+    }
+
+</script>
 {% block content %}
-<div class="row-fluid">
+    <div class="row-fluid">
 
-  <div class="span3">
-    <div class="well sidebar-nav">
-      <ul class="nav nav-list">
-        <li class="active">
-          <a href="/services_manage/" style="margin:0cm;">服务列表</a>
-        </li>
-        <li>
-          <a href="/create_service/" style="margin:0cm;">创建服务</a>
-        </li>
-        <li>
-          <a href="/update_service/" style="margin:0cm;">更新服务</a>
-        </li>
-{#        <li>#}
-{#          <a href="/update_services/">删除服务</a>#}
-{#        </li>#}
-      </ul>
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li class="active">
+                        <a href="/services_manage/" style="margin:0cm;">服务列表</a>
+                    </li>
+                    <li>
+                        <a href="/create_service/" style="margin:0cm;">创建服务</a>
+                    </li>
+                    <li>
+                        <a href="/update_service/" style="margin:0cm;">更新服务</a>
+                    </li>
+                    {#                    <li>#}
+                    {#          <a href="/update_images/">同步镜像</a>#}
+                    {#                        <a href="/image/" methods="post" style="margin:0cm;">同步镜像</a>#}
+                    {#                        <a href="/image/" onclick="test()" style="margin:0cm;">"This,ruit.</a>#}
+                    {#                    </li>#}
+                </ul>
+                <form id="_form" class="form-horizontal" method="post" action="/image/">
+{#                    form-horizontal#}
+                    {#                    <input type="hidden" name="name" value="value"/>#}
+                    <div class="control-group">
+{#                        <div class="controls">#}
+{#                            <a onclick="document.getElementById('_form').submit();">同步镜像</a>#}
+{#                        </div>#}
+                        <button type="submit" class="well sidebar-nav">同步镜像</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="span9 well">
+            {% block showpage %}
+                <form class="form-horizontal" role="form" method="get" action="/search_service/">
+                    <div class="control-group">
+                        <div class="controls">
+                            <input type="text" class="input" name="search">
+                            <button type="submit" class="btn">查询</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table">
+                    <th></th>
+                    <th>服务名</th>
+                    <th>实例数量</th>
+                    <th>镜像名</th>
+                    <th>创建时间</th>
+                    <th>details</th>
+                    <tr>{{ search_error }}</tr>
+                    <form class="form-horizontal" role="form" method="post">
+                        <!--show ip list-->
+                        {% if show_list %}
+                            {% for service in show_list %}
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox" name="post_service"
+                                               value="{{ service.service_name }}"></td>
+                                    <td>
+                                        <a href="/instance_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a>
+                                    </td>
+                                    <td>{{ service.instance_amount }}</td>
+                                    <td>{{ service.image_name }}</td>
+                                    <td>{{ service.created_at }}</td>
+                                    <td>{{ service.details }}</td>
+                                </tr>
+                            {% endfor %}
+                            <button type="submit" class="btn">删除</button>
+                        {% endif %}
+
+                    </form>
+                </table>
+
+                {% if paginator.page_range %}
+                    <ul class="pagination">
+                        {% if show_list.has_previous %}
+                            <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a>
+                            </li>
+                        {% endif %}
+                        {% for i in paginator.page_range %}
+                            <li><a href="?page={{ i }}&search={{ s_text }}" name="page">{{ i }}</a></li>
+                        {% endfor %}
+                        {% if show_list.has_next %}
+                            <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+            {% endblock %}
+        </div>
+
     </div>
-  </div>
-
-  <div class="span9 well">
-  {% block showpage %}
-    <form class="form-horizontal" role="form" method="get" action="/search_service/">
-      <div class="control-group">
-        <div class="controls">
-          <input type="text" class="input" name="search">
-          <button type="submit" class="btn">查询</button>
-          </div>
-      </div>
-    </form>
-
-      <table class="table">
-        <th></th>
-        <th>服务名</th>
-        <th>实例数量</th>
-        <th>镜像名</th>
-        <th>创建时间</th>
-        <th>details</th>
-        <tr>{{search_error}}</tr>
-        <form class="form-horizontal" role="form" method="post">
-        <!--show ip list-->
-          {% if show_list %}
-            {% for service in show_list %}
-            <tr>
-              <td><input type="checkbox" class="checkbox" name="post_service" value="{{ service.service_name }}"></td>
-              <td><a href="/instance_manage/?service_name={{ service.service_name }}">{{ service.service_name }}</a></td>
-              <td>{{ service.instance_amount }}</td>
-              <td>{{ service.image_name }}</td>
-              <td>{{ service.created_at }}</td>
-              <td>{{ service.details }}</td>
-            </tr>
-            {% endfor %}
-            <button type="submit" class="btn">删除</button>
-          {%endif%}
-
-        </form>
-      </table>
-
-
-    {% if paginator.page_range %}
-    <ul class="pagination">
-      {% if show_list.has_previous %}
-      <li><a href="?page={{ show_list.previous_page_number }}&search={{ s_text }}">&laquo;</a></li>
-      {% endif %}
-      {% for i in paginator.page_range %}
-      <li><a href="?page={{i}}&search={{ s_text }}" name="page">{{ i }}</a></li>
-      {%endfor%}
-      {% if show_list.has_next %}
-      <li><a href="?page={{ show_list.next_page_number }}&search={{ s_text }}">&raquo;</a></li>
-      {% endif %}
-    </ul>
-    {% endif %}
-
-  {% endblock %}
-  </div>
-
-</div>
 {% endblock %}

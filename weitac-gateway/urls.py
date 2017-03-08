@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls import url
 from django.contrib import admin
-from services.views import ServiceViewSet
+from services.views import ServiceViewSet,ImageViewSet,InstanceViewSet
 import services
 from configurations.views import ConfigurationViewSet
 # from events.views import
@@ -26,7 +26,14 @@ urlpatterns = patterns('',
                        url(r'^create_service/$', 'services.views.create_service'),
 
                        url(r'^update_service/$', 'services.views.update_service'),
-                       url(r'^services/?',
+                       # url(r'^stop_instance/$', 'services.views.stop_instance'),
+                       url(r'^instance/?',
+                           InstanceViewSet.as_view({'post': 'create_instance',
+                                                   'put': 'stop_instance',
+                                                   'delete': 'delete_instance',
+                                                   'get': 'get_instances',
+                                                   })),
+                       url(r'^service/?',
                            ServiceViewSet.as_view({'post': 'create_service',
                                                    'put': 'update_services',
                                                    'delete': 'delete_services',
@@ -51,6 +58,9 @@ urlpatterns = patterns('',
                        # url(r'^search_job/$','jobs.views.search_job'),
 
                        url(r'^event_handle/$', 'events.views.event_handle'),
+                       url(r'^image/$',
+                           ImageViewSet.as_view({'get': 'get_image',
+                                                 'post': 'update_image'})),
 
                        # url(r'^create_service/$',
                        #     ServiceViewSet.as_view({'post': 'create_service'})),

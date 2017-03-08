@@ -163,7 +163,11 @@ LOGGING = {
 # config of djcelery
 djcelery.setup_loader()
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+# CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = "database"
+# CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
+# CELERY_RESULT_DBURI = "mysql+mysqlconnector://root:111111@localhost:3306/weitac_gateway"
+CELERY_RESULT_DBURI = "db+mysql://root:111111@localhost:3306/weitac_gateway"
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
@@ -179,3 +183,5 @@ CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 #         'args': (16, 16)
 #     },
 # }
+
+

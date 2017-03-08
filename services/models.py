@@ -43,6 +43,7 @@ class Instance(models.Model):
     hostname = models.CharField(max_length=512, null=True)
     volumes = models.CharField(max_length=512, null=True)
     environment = models.CharField(max_length=512, null=True)
+    state = models.CharField(max_length=20,null=True)
 
 # app_id = models.CharField(db_index=True, max_length=512)
 #     finished_at = models.IntegerField(default=0)
@@ -57,3 +58,12 @@ class Instance(models.Model):
 #
 # class Meta:
 #     unique_together = ('instance_id', 'survived_day')
+
+
+class Image(models.Model):
+    name = models.CharField(max_length=512)
+    project = models.CharField(max_length=512)
+    repository = models.CharField(max_length=512)
+    tag = models.CharField(max_length=512)
+    registry = models.CharField(max_length=512, default='docker.weitac.com')
+

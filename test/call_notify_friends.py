@@ -1,7 +1,7 @@
 # call_notify_friends.py
 from celery_test import notify_friends
 import time
-
+from jobs.tasks import add
 
 def notify(userId, messageId):
     result = notify_friends.delay(userId, messageId)

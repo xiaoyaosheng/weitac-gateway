@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
-from models import Service, Instance, Agent
+from models import Service, Instance, Agent, Image
 import logging
 import requests
 import docker
@@ -12,7 +12,7 @@ import docker
 import time
 from django.utils import timezone
 from services.serializers import ServiceSerializer
-from utils import service_DBclient
+from utils import service_DBclient,instance_DBclient
 from django.shortcuts import render_to_response
 from jobs.views import call_agent_change_ip
 from django.http import HttpRequest, QueryDict
@@ -22,15 +22,16 @@ from rest_framework.parsers import JSONParser, FormParser
 from rest_framework import permissions
 import datetime
 import base64
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from settings import HARBOR_URL
 
 logger = logging.getLogger(__name__)
 from services.settings import SWARM_URL
 
-swarm_client = docker.Client(base_url='tcp://{}'.format(SWARM_URL), timeout=10)
+swarm_client = docker.Client(base_url='tcp://{}'.format(SWARM_URL), timeout=60)
 
 
 def datetime_to_timestamp(t):
@@ -300,8 +301,6 @@ def instance_manage(request):
 #     # print instance_name, ip
 #     service_DBclient.change_db_ip(instance_name, ip, subnet_mask, gateway_ip)
 #     return True
-
-
 
 
 def assignment_ip(instance_name):
@@ -602,7 +601,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
                                             hostname, command, volumes)
                         if not bl:
                             # return render_to_response('500.html')
-                            return Response('False',status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            return Response('False', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                         bl.service = service_obj[0]
                         bl.save()
                         if not bl:
@@ -821,3 +820,118 @@ class Instance_client(object):
             except:
                 pass
         return db_info
+
+    def stop_instance(self, instance_name):
+        logger.info('Stop continer of: {}'.format(instance_name))
+
+        try:
+            swarm_client.stop(container=instance_name)
+
+            return True
+            # requests.post(SWARM_URL + '/containers/{}/start'.format(continer_id))
+        except Exception as ex:
+            logger.error("Error: {}".format(ex))
+            return False
+
+    def get_exited_instance(self):
+        result_list=[]
+        exited_containers = swarm_client.containers(filters={'status': 'exited'})
+        for exited_container in exited_containers:
+            container= exited_container['Names'][0].split('/')[-1]
+            result_list.append(container)
+        return result_list
+
+class ImageViewSet(viewsets.ModelViewSet):
+    def update_image(self, request, **kwargs):
+
+        request_json = False
+        if 'json' in request.GET.keys():
+            request_json = True
+        try:
+            r = requests.get('{}/api/search'.format(HARBOR_URL))
+        except requests.ConnectionError as ex:
+            logger.error(ex)
+            return Response('Fail connet to Harbor.try again', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as ex:
+            logger.error(ex)
+            return Response('Fail', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # http://10.6.168.54/api/repositories/tags?repo_name=tengyu/weitac_gateway
+        dic_info = json.loads(r.text)
+        repositorys = dic_info.get('repository')
+        for repository in repositorys:
+            repository_name = repository.get('repository_name')
+            tags_str = requests.get('{0}/api/repositories/tags?repo_name={1}'.format(HARBOR_URL, repository_name))
+            tags = json.loads(tags_str.text)
+
+            for tag in tags:
+                project = repository_name.split('/')[0]
+                repository = repository_name.split('/')[1]
+                create_update_image(project, repository, tag)
+        if request_json == True:
+            return Response('Update success', status=status.HTTP_200_OK)
+        else:
+            return HttpResponse('Update success', status=status.HTTP_200_OK)
+
+    def get_image(self, request, **kwargs):
+        request_json = False
+        if 'json' in request.GET.keys():
+            request_json = True
+
+        result = dict()
+        images = Image.objects.all()
+        for image in images:
+            if image.project not in result:
+                result.setdefault(image.project)
+                result[image.project] = dict()
+            if image.repository not in result[image.project]:
+                result[image.project].setdefault(image.repository)
+                result[image.project][image.repository] = list()
+            result[image.project][image.repository].append(image.tag)
+        if request_json == True:
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return HttpResponse(result, status=status.HTTP_200_OK)
+
+
+def create_update_image(project, repository, tag):
+    if not Image.objects.filter(project=project, repository=repository, tag=tag):
+        logger.info('add new {}/{}:{}'.format(project, repository, tag))
+        image_obj = Image()
+        image_obj.project = project
+        image_obj.repository = repository
+        image_obj.tag = tag
+        image_obj.name = 'docker.weitac.com/{}/{}:{}'.format(project, repository, tag)
+        image_obj.save()
+
+
+class InstanceViewSet(viewsets.ModelViewSet):
+    def stop_instance(self, request):
+        data = request.DATA
+        print data
+        instances = data.get('instance')
+
+        for instance in instances:
+            result=Instance_client().stop_instance(instance)
+
+            if result is True:
+                if instance in Instance_client().get_exited_instance():
+                    instance_DBclient.update_instance(instance,status='Exited')
+            else:
+                # return Response(
+                #     'Delete service error.',
+                #     status=status.HTTP_400_BAD_REQUEST)
+                return render_to_response('400.html')
+        # if none
+
+        # return Response('success', status=status.HTTP_200_OK)
+        services = Service.objects.all()
+        return render_to_response(
+            'service_manage.html', {
+                'username': request.user.username, 'show_list': services})
+
+    def create_instance(self):
+        pass
+    def delete_instance(self):
+        pass
+    def get_instances(self):
+        pass
